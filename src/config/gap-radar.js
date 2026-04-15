@@ -1,23 +1,37 @@
 // Gap Radar — Demo Brief §9.
-// Default fill: Alexion template. Overwrite per demo.
+// Fill: Dyne. Agent-proposed new KIQs / LPs / KITs to close coverage gaps.
 
 export const GAP_RADAR = [
   {
     type: 'New LP',
-    moRef: 'MO4',
-    suggestion: 'Complement biology scientific exchange — mechanistic differentiation vs next-gen agents',
-    rationale: 'MO4 (scientific exchange) has 0 qualifying insights this cycle (Gap). Current LPs don’t cover mechanistic-differentiation conversations where they are happening.',
+    moRef: 'MO3',
+    suggestion:
+      'Patient-advocacy intelligence across MDA / PPMD / MDF / FSHD Society',
+    rationale:
+      'MO3 is a Gap and no current LP tracks advocacy-community sentiment, which is load-bearing pre-launch in rare disease. AI5 (Pompe ERT transition) surfaced advocacy language that the strategy has no place to land.',
   },
   {
     type: 'New KIQ',
-    moRef: 'MO1',
-    suggestion: '“What pediatric dosing confidence gap remains between registry data and community practice?”',
-    rationale: 'Pediatric aHUS insight (AI5) is isolated — no LP currently triangulates pediatric dosing confidence. Low coverage in MO1 overall.',
+    moRef: 'MO3',
+    suggestion:
+      '"Which 3–5 KOLs are credibly positioned to frame FORCE as a platform across ≥2 neuromuscular indications?"',
+    rationale:
+      'AI4 confirms cross-indication KOL scarcity. LP4 covers mapping but not the narrower question of who is actually ready to speak portfolio-level.',
   },
   {
     type: 'New KIT',
     moRef: 'MO2',
-    suggestion: 'Patient-facing switch-stability one-pager (co-created with community HCPs)',
-    rationale: 'Recurring community-center request across AI1 and AI4. KIT library currently lacks patient-facing material.',
+    suggestion:
+      'Community-facing "FORCE vs AOC" one-pager (non-internal language)',
+    rationale:
+      'Recurring ask across AI1 and AI3. The FORCE vs AOC conversation is happening with or without Dyne; MSL materials exist but read as internal decks.',
+  },
+  {
+    type: 'New KIQ',
+    moRef: 'MO4',
+    suggestion:
+      '"How confident are community neurologists in candidate selection for ACHIEVE-eligible DM1 patients?"',
+    rationale:
+      'AI2 shows DM1 community readiness is uneven. LP3 covers endpoint interpretation but not the clinical-decision question — who does the clinician put on therapy?',
   },
 ];
