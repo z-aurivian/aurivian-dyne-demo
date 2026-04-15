@@ -5,7 +5,6 @@ import CongressIngestion from './components/CongressIngestion';
 import MedicalInsights from './components/MedicalInsights';
 import KOLManagement from './components/KOLManagement';
 import AuriChat from './components/AuriChat';
-import Dashboard from './components/Dashboard';
 import Login from './components/Login';
 import CommandCenter from './components/CommandCenter';
 import AuriSidebar from './components/AuriSidebar';
@@ -36,7 +35,7 @@ function Shell() {
   const currentProduct = PRODUCT_OPTIONS.find(p => p.id === selectedProduct);
 
   // Primary nav: only Command Center lives in the header. Secondary surfaces
-  // (ARIA, LUCA, NOVA, Dashboard, Auri) are exposed from inside Command Center.
+  // (ARIA, LUCA, NOVA, Journey, Artifacts, Auri) are exposed from inside Command Center.
   const primaryNav = [
     { path: '/', label: 'Command Center', icon: Home },
   ];
@@ -157,7 +156,6 @@ function Shell() {
           <Route path="/insights" element={<MedicalInsights selectedProduct={selectedProduct} />} />
           <Route path="/kol" element={<KOLManagement selectedProduct={selectedProduct} />} />
           <Route path="/auri" element={<AuriChat selectedProduct={selectedProduct} />} />
-          <Route path="/dashboard" element={<Dashboard selectedCongress={selectedCongress} />} />
           <Route path="/journey" element={<InsightJourney />} />
           <Route path="/artifacts" element={<ArtifactLibrary />} />
           <Route path="*" element={<Navigate to="/" replace />} />

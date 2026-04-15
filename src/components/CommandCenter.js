@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import {
   Send, Sparkles,
   Activity, Microscope, Users as UsersIcon,
-  LayoutDashboard, MessageSquare, ExternalLink,
+  MessageSquare, ExternalLink,
   Radar, ArrowUpRight, Target, FolderOpen, GitBranch,
 } from 'lucide-react';
 import {
@@ -22,7 +22,6 @@ const AGENTS = [
 const SURFACES = [
   { path: '/journey',   label: 'Insight Journey',  icon: GitBranch },
   { path: '/artifacts', label: 'Artifacts',        icon: FolderOpen },
-  { path: '/dashboard', label: 'Dashboard',        icon: LayoutDashboard },
   { path: '/auri',      label: 'Auri Chat',        icon: MessageSquare },
 ];
 
