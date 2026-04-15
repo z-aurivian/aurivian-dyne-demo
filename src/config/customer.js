@@ -1,16 +1,16 @@
 // Customer identity — populated per demo from the Demo Brief (§1).
-// Default: Alexion (the master template's example fill).
+// Fill: Dyne Therapeutics (prospect meeting 2026-04, Eric Krauter).
 
 export const CLIENT = {
-  name: 'Alexion',
-  parentCompany: 'AstraZeneca',
-  division: 'Rare Disease',
+  name: 'Dyne Therapeutics',
+  parentCompany: null,
+  division: 'Medical Affairs',
   franchiseDescription:
-    'Complement inhibitors for rare hematologic and neurological disorders (PNH, aHUS, gMG, NMOSD)',
+    'FORCE™-enabled oligonucleotide therapies for inherited neuromuscular disease (DMD, DM1, FSHD, Pompe)',
   cloudLabel: 'your cloud',
-  // Optional accent color override. Leave null to inherit the Aurivian palette.
+  // Optional accent color override. Null = Aurivian blue.
   accentHex: null,
-  // Optional logo asset path or URL (SVG preferred). Leave null to use the wordmark.
+  // Optional logo asset path or URL.
   logoSrc: null,
 };
 
