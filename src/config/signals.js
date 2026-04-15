@@ -1,40 +1,47 @@
 // Background signals — Demo Brief §11.
-// Default fill: Alexion template. Overwrite per demo.
+// Fill: Dyne. Always-listening feed on the Command Center.
 
 export const SIGNALS = [
   {
     agent: 'LUCA',
     timestamp: '2026-04-14T09:12:00Z',
-    headline: '2 emerging NMOSD KOLs crossed the watch threshold',
-    context: 'Publication cadence and congress-speaking frequency both up 40% vs. prior 6 months. Neither is currently on the NMOSD engagement list.',
+    headline: '2 emerging cross-indication voices crossed the watch threshold',
+    context: 'Marcus Reid (Royal London) and Barbara Smith-Anderson (Seattle Children\'s) both authored across ≥2 FORCE indications in the last 6 months. Directly relevant to AI4 (cross-indication KOL scarcity).',
     suggestedAction: { label: 'Open in LUCA', path: '/kol' },
   },
   {
     agent: 'ARIA',
     timestamp: '2026-04-13T15:30:00Z',
-    headline: 'Competitor (iptacopan) symposium added at EHA 2026',
-    context: 'Late-breaking PNH extension data announced. No equivalent Alexion session currently scheduled in that room.',
+    headline: 'Avidity AOC session added at ASGCT 2026 — direct FORCE comparator content',
+    context: 'New late-breaking delivery-mechanism session announced. Dyne\'s ASGCT presence will need positioning around AI3 (AOC differentiation debate).',
     suggestedAction: { label: 'Open in ARIA', path: '/congress' },
   },
   {
     agent: 'NOVA',
     timestamp: '2026-04-12T11:00:00Z',
-    headline: 'Recurrence threshold hit: infusion-burden switch hesitancy',
-    context: 'Insight AI1 recorded a third source this month — now at Prioritised status. Strategy-to-Action recommends community-facing materials.',
+    headline: 'Recurrence threshold hit: senior DMD PI delivery skepticism',
+    context: 'Insight AI1 recorded a fourth source this month — now Prioritised. Strategy-to-Action recommends commissioning 52-week biodistribution summary (A1 Started).',
     suggestedAction: { label: 'Review in NOVA', path: '/insights' },
   },
   {
     agent: 'LUCA',
     timestamp: '2026-04-10T08:45:00Z',
-    headline: 'Sentiment shift: Dr. K. Rhee toward C5 sequencing in NMOSD',
-    context: 'Two recent congress talks and one podcast indicate shifting preference on sequencing C5 vs. IL-6 inhibition.',
+    headline: 'Sentiment shift: Francesco Muntoni warming to FORCE mechanism',
+    context: 'Two recent WMS 2025 comments and an ICNMD 2026 abstract indicate shifting from PMO-aligned to mechanism-curious. Tier 1 EU DMD voice worth proactive engagement.',
     suggestedAction: { label: 'Open KOL profile', path: '/kol' },
   },
   {
     agent: 'NOVA',
     timestamp: '2026-04-08T16:20:00Z',
-    headline: 'New RWE publication on Ultomiris in gMG (Muscle & Nerve)',
-    context: '12-month retention data in refractory subgroup. Relevant to MO3 (guideline alignment) and AI3.',
+    headline: 'New PepGen EDODM1 Phase 1b topline — DM1 competitive signal',
+    context: 'Competitor EDO-platform DM1 data landed with mixed reception. Relevant to LP2 (sequencing) and MO1 (FORCE platform evidence).',
     suggestedAction: { label: 'Open in NOVA', path: '/insights' },
+  },
+  {
+    agent: 'ARIA',
+    timestamp: '2026-04-05T10:15:00Z',
+    headline: 'MDA 2026 Orlando — Dyne DELIVER and ACHIEVE presentations captured',
+    context: 'ARIA attended 3 late-breaker sessions, 2 posters, and the DMD scientific symposium. Competitor visibility (Sarepta, Avidity) up 22% vs MDA 2025.',
+    suggestedAction: { label: 'Open debrief', path: '/congress' },
   },
 ];
