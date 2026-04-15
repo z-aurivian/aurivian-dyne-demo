@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   Send, Sparkles,
   Activity, Microscope, Users as UsersIcon,
-  Database, BarChart3, LayoutDashboard, MessageSquare, ExternalLink,
+  LayoutDashboard, MessageSquare, ExternalLink,
   Radar, ArrowUpRight, Target, FolderOpen, GitBranch,
 } from 'lucide-react';
 import {
@@ -17,10 +17,9 @@ const AGENTS = [
   { id: 'nova', name: 'NOVA', tagline: 'Transforms fragmented science into decisions.', role: 'Medical Insights', icon: Microscope, path: '/insights' },
 ];
 
+// Non-agent surfaces only. ARIA/LUCA/NOVA live in the agent grid below;
+// duplicating them as pills was adding clutter without adding affordance.
 const SURFACES = [
-  { path: '/congress',  label: 'ARIA · Congress',  icon: Database },
-  { path: '/kol',       label: 'LUCA · KOL',       icon: UsersIcon },
-  { path: '/insights',  label: 'NOVA · Insights',  icon: BarChart3 },
   { path: '/journey',   label: 'Insight Journey',  icon: GitBranch },
   { path: '/artifacts', label: 'Artifacts',        icon: FolderOpen },
   { path: '/dashboard', label: 'Dashboard',        icon: LayoutDashboard },
@@ -51,26 +50,30 @@ function relativeTime(iso) {
 }
 
 export default function CommandCenter() {
+  const [signalsExpanded, setSignalsExpanded] = useState(false);
+  const [gapsExpanded, setGapsExpanded] = useState(false);
+
   const remaining = OUTCOME_VOLUME.committed - OUTCOME_VOLUME.consumed;
   const consumedPct = Math.round((OUTCOME_VOLUME.consumed / OUTCOME_VOLUME.committed) * 100);
 
+  const visibleSignals = signalsExpanded ? SIGNALS : SIGNALS.slice(0, 3);
+  const hiddenSignalsCount = Math.max(0, SIGNALS.length - 3);
+
+  const visibleGaps = gapsExpanded ? GAP_RADAR : GAP_RADAR.slice(0, 1);
+  const hiddenGapsCount = Math.max(0, GAP_RADAR.length - 1);
+
   return (
     <div className="space-y-6">
-      {/* Welcome */}
-      <div>
-        <h1 className="text-2xl font-semibold text-auri-text mb-1">
-          Welcome{CLIENT?.name ? `, ${CLIENT.name}` : ''}
-        </h1>
-        <p className="text-sm text-auri-muted">
-          Direct your agents in plain language. They return structured, auditable results.
-        </p>
-      </div>
-
-      {/* Directive input */}
+      {/* Directive input — hero. The welcome header was pulled out; the
+          input's own framing carries the intent without extra copy. */}
       <div className="bg-white border border-auri-border rounded-xl p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkles size={16} className="text-auri-blue" />
-          <span className="text-sm font-medium text-auri-text">What would you like to direct?</span>
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="flex items-center gap-2">
+            <Sparkles size={16} className="text-auri-blue" />
+            <span className="text-sm font-medium text-auri-text">
+              {CLIENT?.name ? `${CLIENT.name} — ` : ''}what would you like to direct?
+            </span>
+          </div>
         </div>
         <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
           <input
@@ -86,35 +89,6 @@ export default function CommandCenter() {
             Direct
           </button>
         </form>
-        <p className="text-xs text-auri-muted mt-2">
-          Aurivian will route your request to the right agent and return an auditable result.
-        </p>
-      </div>
-
-      {/* Secondary surfaces */}
-      <div className="flex flex-wrap items-center gap-2">
-        {SURFACES.map((s) => {
-          const Icon = s.icon;
-          return (
-            <NavLink
-              key={s.path}
-              to={s.path}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-white border border-auri-border text-auri-muted hover:text-auri-text hover:border-auri-blue/50 transition-all"
-            >
-              <Icon size={16} />
-              <span>{s.label}</span>
-            </NavLink>
-          );
-        })}
-        <a
-          href={CAPTURE_APP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-white border border-auri-border text-auri-muted hover:text-auri-text hover:border-auri-blue/50 transition-all"
-        >
-          <ExternalLink size={16} />
-          <span>Congress Capture</span>
-        </a>
       </div>
 
       {/* Your Agents */}
@@ -155,9 +129,35 @@ export default function CommandCenter() {
         </div>
       </div>
 
+      {/* Secondary surfaces — non-agent only. Agents are in the grid above. */}
+      <div className="flex flex-wrap items-center gap-2">
+        {SURFACES.map((s) => {
+          const Icon = s.icon;
+          return (
+            <NavLink
+              key={s.path}
+              to={s.path}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-white border border-auri-border text-auri-muted hover:text-auri-text hover:border-auri-blue/50 transition-all"
+            >
+              <Icon size={16} />
+              <span>{s.label}</span>
+            </NavLink>
+          );
+        })}
+        <a
+          href={CAPTURE_APP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-white border border-auri-border text-auri-muted hover:text-auri-text hover:border-auri-blue/50 transition-all"
+        >
+          <ExternalLink size={16} />
+          <span>Congress Capture</span>
+        </a>
+      </div>
+
       {/* Two-column: Signals + Coverage */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Signals */}
+        {/* Signals — top 3 by default, expand to see the rest */}
         <div className="bg-white border border-auri-border rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -168,7 +168,7 @@ export default function CommandCenter() {
             <span className="text-xs text-auri-muted">{SIGNALS.length} new</span>
           </div>
           <div className="space-y-3">
-            {SIGNALS.map((s, idx) => (
+            {visibleSignals.map((s, idx) => (
               <NavLink
                 key={idx}
                 to={s.suggestedAction?.path || '/'}
@@ -187,6 +187,14 @@ export default function CommandCenter() {
               </NavLink>
             ))}
           </div>
+          {hiddenSignalsCount > 0 && (
+            <button
+              onClick={() => setSignalsExpanded(!signalsExpanded)}
+              className="mt-3 text-xs text-auri-blue hover:underline"
+            >
+              {signalsExpanded ? 'Show less' : `View all (${SIGNALS.length})`}
+            </button>
+          )}
         </div>
 
         {/* Strategic Coverage */}
@@ -240,28 +248,38 @@ export default function CommandCenter() {
         </div>
       </div>
 
-      {/* Gap Radar */}
-      <div className="bg-white border border-auri-border rounded-xl p-5">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Radar size={14} className="text-auri-blue" />
-            <h3 className="text-sm font-semibold text-auri-text">Gap Radar</h3>
-            <span className="text-xs text-auri-muted">agent-proposed</span>
+      {/* Gap Radar — featured single by default, expand for the rest */}
+      {GAP_RADAR.length > 0 && (
+        <div className="bg-white border border-auri-border rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Radar size={14} className="text-auri-blue" />
+              <h3 className="text-sm font-semibold text-auri-text">Gap Radar</h3>
+              <span className="text-xs text-auri-muted">agent-proposed</span>
+            </div>
+            {hiddenGapsCount > 0 && (
+              <button
+                onClick={() => setGapsExpanded(!gapsExpanded)}
+                className="text-xs text-auri-blue hover:underline"
+              >
+                {gapsExpanded ? 'Show less' : `+${hiddenGapsCount} more`}
+              </button>
+            )}
+          </div>
+          <div className={`grid gap-3 ${gapsExpanded ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1'}`}>
+            {visibleGaps.map((g, idx) => (
+              <div key={idx} className="p-4 rounded-lg border border-auri-border bg-auri-card">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] font-medium uppercase tracking-wider text-auri-blue">{g.type}</span>
+                  <span className="text-[10px] text-auri-muted">{g.moRef}</span>
+                </div>
+                <div className="text-sm text-auri-text font-medium mb-1.5 leading-snug">{g.suggestion}</div>
+                <p className="text-xs text-auri-muted leading-relaxed">{g.rationale}</p>
+              </div>
+            ))}
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {GAP_RADAR.map((g, idx) => (
-            <div key={idx} className="p-4 rounded-lg border border-auri-border bg-auri-card">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-[10px] font-medium uppercase tracking-wider text-auri-blue">{g.type}</span>
-                <span className="text-[10px] text-auri-muted">{g.moRef}</span>
-              </div>
-              <div className="text-sm text-auri-text font-medium mb-1.5 leading-snug">{g.suggestion}</div>
-              <p className="text-xs text-auri-muted leading-relaxed">{g.rationale}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
     </div>
   );
 }
