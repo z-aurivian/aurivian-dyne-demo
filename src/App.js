@@ -10,6 +10,7 @@ import Login from './components/Login';
 import CommandCenter from './components/CommandCenter';
 import AuriSidebar from './components/AuriSidebar';
 import ArtifactLibrary from './components/ArtifactLibrary';
+import InsightJourney from './components/InsightJourney';
 import { PRODUCT_OPTIONS, CONGRESS_OPTIONS, OUTCOME_VOLUME } from './config';
 import './App.css';
 
@@ -157,6 +158,7 @@ function Shell() {
           <Route path="/kol" element={<KOLManagement selectedProduct={selectedProduct} />} />
           <Route path="/auri" element={<AuriChat selectedProduct={selectedProduct} />} />
           <Route path="/dashboard" element={<Dashboard selectedCongress={selectedCongress} />} />
+          <Route path="/journey" element={<InsightJourney />} />
           <Route path="/artifacts" element={<ArtifactLibrary />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

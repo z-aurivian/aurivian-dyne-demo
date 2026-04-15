@@ -4,7 +4,7 @@ import {
   Send, Sparkles,
   Activity, Microscope, Users as UsersIcon,
   Database, BarChart3, LayoutDashboard, MessageSquare, ExternalLink,
-  Radar, ArrowUpRight, Target, FolderOpen,
+  Radar, ArrowUpRight, Target, FolderOpen, GitBranch,
 } from 'lucide-react';
 import {
   CLIENT, CAPTURE_APP_URL,
@@ -21,6 +21,7 @@ const SURFACES = [
   { path: '/congress',  label: 'ARIA · Congress',  icon: Database },
   { path: '/kol',       label: 'LUCA · KOL',       icon: UsersIcon },
   { path: '/insights',  label: 'NOVA · Insights',  icon: BarChart3 },
+  { path: '/journey',   label: 'Insight Journey',  icon: GitBranch },
   { path: '/artifacts', label: 'Artifacts',        icon: FolderOpen },
   { path: '/dashboard', label: 'Dashboard',        icon: LayoutDashboard },
   { path: '/auri',      label: 'Auri Chat',        icon: MessageSquare },
