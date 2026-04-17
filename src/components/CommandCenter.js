@@ -51,6 +51,7 @@ function relativeTime(iso) {
 export default function CommandCenter() {
   const [signalsExpanded, setSignalsExpanded] = useState(false);
   const [gapsExpanded, setGapsExpanded] = useState(false);
+  const [directiveInput, setDirectiveInput] = useState('');
 
   const remaining = OUTCOME_VOLUME.committed - OUTCOME_VOLUME.consumed;
   const consumedPct = Math.round((OUTCOME_VOLUME.consumed / OUTCOME_VOLUME.committed) * 100);
@@ -74,9 +75,17 @@ export default function CommandCenter() {
             </span>
           </div>
         </div>
-        <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
+        <form className="flex gap-2" onSubmit={(e) => {
+          e.preventDefault();
+          const text = directiveInput.trim();
+          if (!text) return;
+          window.dispatchEvent(new CustomEvent('auri:directive', { detail: text }));
+          setDirectiveInput('');
+        }}>
           <input
             type="text"
+            value={directiveInput}
+            onChange={(e) => setDirectiveInput(e.target.value)}
             placeholder='e.g. "Summarise the most important signals from the last congress cycle."'
             className="flex-1 px-4 py-3 rounded-lg border border-auri-border bg-auri-card text-sm text-auri-text focus:outline-none focus:border-auri-blue"
           />

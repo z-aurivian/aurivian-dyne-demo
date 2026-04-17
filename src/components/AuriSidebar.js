@@ -8,11 +8,21 @@ import AuriChatPanel from './AuriChatPanel';
  */
 export default function AuriSidebar({ selectedProduct }) {
   const [open, setOpen] = useState(false);
+  const [directive, setDirective] = useState('');
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  useEffect(() => {
+    const onDirective = (e) => {
+      setDirective(e.detail);
+      setOpen(true);
+    };
+    window.addEventListener('auri:directive', onDirective);
+    return () => window.removeEventListener('auri:directive', onDirective);
   }, []);
 
   return (
@@ -65,7 +75,7 @@ export default function AuriSidebar({ selectedProduct }) {
         </header>
 
         <div className="h-[calc(100%-56px)] p-3">
-          <AuriChatPanel selectedProduct={selectedProduct} compact showIntro />
+          <AuriChatPanel selectedProduct={selectedProduct} compact showIntro initialDirective={directive} />
         </div>
       </aside>
     </>

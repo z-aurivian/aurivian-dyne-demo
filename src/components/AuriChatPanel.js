@@ -35,10 +35,12 @@ export default function AuriChatPanel({
   compact = false,
   showIntro = true,
   className = '',
+  initialDirective = '',
 }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [processedDirective, setProcessedDirective] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -51,6 +53,14 @@ export default function AuriChatPanel({
   useEffect(() => {
     setMessages([]);
   }, [selectedProduct]);
+
+  useEffect(() => {
+    if (initialDirective && initialDirective !== processedDirective) {
+      setProcessedDirective(initialDirective);
+      handleSend(initialDirective);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialDirective]);
 
   const handleSend = async (text) => {
     const messageText = text || input.trim();
