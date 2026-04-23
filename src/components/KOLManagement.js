@@ -1,65 +1,15 @@
-import React, { useState, useMemo, useRef, useCallback } from 'react';
-import ForceGraph2D from 'react-force-graph-2d';
-import { Search, Filter, ChevronDown, ChevronUp, MapPin, BookOpen, Calendar, Star, Users, Globe, Network, TableIcon } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Search, Filter, ChevronDown, ChevronUp, MapPin, BookOpen, Calendar, Star, Users, Globe } from 'lucide-react';
 import { KOL_DATA, PRODUCT_OPTIONS } from '../data/demoData';
 import AgentSurfaceHeader from './AgentSurfaceHeader';
 
-// Build KOL graph dynamically from filtered data
-function buildKOLGraph(kolData, selectedProduct) {
-  const nodes = kolData.map((k, i) => ({
-    id: String(k.id),
-    name: k.name,
-    institution: k.institution,
-    country: k.country,
-    city: k.city,
-    region: k.region,
-    influenceScore: k.influenceScore,
-    engagementTier: k.engagementTier,
-    focusAreas: k.focusAreas,
-    publications: k.publications,
-    conferenceAppearances: k.conferenceAppearances,
-    productAlignment: k.productAlignment,
-  }));
-
-  const links = [];
-  const addLink = (sourceId, targetId, type) => {
-    const exists = links.find(
-      l => (l.source === sourceId && l.target === targetId) || (l.source === targetId && l.target === sourceId)
-    );
-    if (!exists && sourceId !== targetId) {
-      links.push({ source: sourceId, target: targetId, type });
-    }
-  };
-
-  for (let i = 0; i < kolData.length; i++) {
-    for (let j = i + 1; j < kolData.length; j++) {
-      const a = kolData[i], b = kolData[j];
-      // Shared focus areas (2+ overlapping)
-      const shared = a.focusAreas?.filter(f => b.focusAreas?.includes(f)) || [];
-      if (shared.length >= 2) addLink(String(a.id), String(b.id), 'focus');
-      // Same country
-      if (a.country === b.country) addLink(String(a.id), String(b.id), 'region');
-      // Same product alignment
-      if (a.productAlignment.includes(selectedProduct) && b.productAlignment.includes(selectedProduct)) {
-        addLink(String(a.id), String(b.id), 'product');
-      }
-    }
-  }
-
-  return { nodes, links };
-}
-
 function KOLManagement({ selectedProduct }) {
-  const [viewMode, setViewMode] = useState('table'); // 'table' | 'graph'
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
   const [selectedTier, setSelectedTier] = useState('all');
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [expandedKOL, setExpandedKOL] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [hoverNode, setHoverNode] = useState(null);
-  const [selectedNode, setSelectedNode] = useState(null);
-  const graphRef = useRef(null);
 
   const productName = PRODUCT_OPTIONS.find(p => p.id === selectedProduct)?.name;
 
@@ -93,12 +43,6 @@ function KOLManagement({ selectedProduct }) {
       }, {}),
     };
   }, [selectedProduct, regions]);
-
-  const graphData = useMemo(() => buildKOLGraph(filteredKOLs, selectedProduct), [filteredKOLs, selectedProduct]);
-
-  const handleNodeLabel = useCallback((node) => `${node.name} · ${node.institution}, ${node.country || ''} · Score ${node.influenceScore}`, []);
-  const handleNodeHover = useCallback((node) => setHoverNode(node), []);
-  const handleNodeClick = useCallback((node) => setSelectedNode((prev) => (prev?.id === node?.id ? null : node)), []);
 
   const tierColor = (tier) => {
     switch (tier) {
@@ -156,25 +100,6 @@ function KOLManagement({ selectedProduct }) {
           >
             <Filter size={16} /> Filters
           </button>
-          {/* View toggle */}
-          <div className="flex items-center border border-auri-border rounded-lg overflow-hidden">
-            <button
-              onClick={() => setViewMode('table')}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all ${
-                viewMode === 'table' ? 'bg-auri-blue text-white' : 'bg-white text-auri-muted hover:text-auri-text'
-              }`}
-            >
-              <TableIcon size={14} /> Table
-            </button>
-            <button
-              onClick={() => setViewMode('graph')}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all ${
-                viewMode === 'graph' ? 'bg-auri-blue text-white' : 'bg-white text-auri-muted hover:text-auri-text'
-              }`}
-            >
-              <Network size={14} /> Graph
-            </button>
-          </div>
         </div>
 
         {showFilters && (
@@ -200,77 +125,7 @@ function KOLManagement({ selectedProduct }) {
         )}
       </div>
 
-      {/* Graph View */}
-      {viewMode === 'graph' && (
-        <div className="bg-auri-card rounded-lg border border-auri-border overflow-hidden">
-          <div className="rounded-lg" style={{ height: 480 }}>
-            <ForceGraph2D
-              ref={graphRef}
-              graphData={graphData}
-              nodeLabel={handleNodeLabel}
-              onNodeHover={handleNodeHover}
-              onNodeClick={handleNodeClick}
-              nodeColor={(node) => (
-                selectedNode?.id === node.id ? '#16a34a' :
-                hoverNode?.id === node.id ? '#4285f4' :
-                node.engagementTier === 'Tier 1' ? '#4285f4' :
-                node.engagementTier === 'Tier 2' ? '#34a853' : '#9ca3af'
-              )}
-              linkColor={(link) => {
-                if (link.type === 'product') return 'rgba(66, 133, 244, 0.5)';
-                if (link.type === 'region') return 'rgba(52, 168, 83, 0.4)';
-                return 'rgba(124, 58, 237, 0.3)';
-              }}
-              linkWidth={(link) => link.type === 'product' ? 2 : 1}
-              backgroundColor="#f9fafb"
-            />
-          </div>
-          <div className="px-6 py-3 border-t border-auri-border flex gap-6 text-xs">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-1 rounded" style={{ backgroundColor: '#4285f4' }} />
-              <span className="text-auri-muted">Product alignment</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-1 rounded" style={{ backgroundColor: '#34a853' }} />
-              <span className="text-auri-muted">Regional (same country)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-1 rounded" style={{ backgroundColor: '#7c3aed' }} />
-              <span className="text-auri-muted">Shared focus areas</span>
-            </div>
-          </div>
-          {selectedNode && (
-            <div className="mx-6 mb-4 p-4 rounded-lg border border-auri-blue/30 bg-auri-blue/5">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <span className="font-semibold text-auri-text">{selectedNode.name}</span>
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${tierColor(selectedNode.engagementTier)}`}>
-                    {selectedNode.engagementTier}
-                  </span>
-                </div>
-                <button onClick={() => setSelectedNode(null)} className="text-xs text-auri-muted hover:text-auri-blue">Clear</button>
-              </div>
-              <div className="text-sm text-auri-muted mb-1">
-                {selectedNode.institution}{selectedNode.city ? `, ${selectedNode.city}` : ''}, {selectedNode.country}
-              </div>
-              <div className="text-sm text-auri-muted mb-1">
-                Score {selectedNode.influenceScore} · {selectedNode.conferenceAppearances} conferences · {selectedNode.publications} publications
-              </div>
-              {selectedNode.focusAreas && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {selectedNode.focusAreas.map((f, i) => (
-                    <span key={i} className="px-2 py-0.5 rounded text-xs bg-auri-blue/10 text-auri-blue">{f}</span>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Table View */}
-      {viewMode === 'table' && (
-        <>
+      {/* KOL Table */}
           <div className="bg-auri-card rounded-lg border border-auri-border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -364,8 +219,6 @@ function KOLManagement({ selectedProduct }) {
           <div className="text-xs text-gray-400 text-right">
             Showing {filteredKOLs.length} of {KOL_DATA.filter(k => k.productAlignment.includes(selectedProduct)).length} KOLs aligned with {productName}
           </div>
-        </>
-      )}
     </div>
     </>
   );
