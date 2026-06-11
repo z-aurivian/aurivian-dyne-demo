@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dyne Therapeutics · Aurivian Pulse · Rare Neuromuscular</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:    #F5F0E9;
+  --paper:    #EDE8DC;
+  --paper-dk: #E4DECE;
+  --ink:      #1A1612;
+  --ink-mid:  #3D3530;
+  --ink-lt:   #7A6E65;
+  --rule:     #D4CEC4;
+
+  --teal:     #0D6E6E;
+  --teal-lt:  #1A8B9B;
+  --amber:    #B5540A;
+  --amber-lt: #E8780F;
+  --rose:     #8B2635;
+  --sage:     #4A6741;
+  --purple:   #5B3F7E;
+
+  --teal-dim:   rgba(13,110,110,0.10);
+  --amber-dim:  rgba(181,84,10,0.10);
+  --rose-dim:   rgba(139,38,53,0.10);
+  --sage-dim:   rgba(74,103,65,0.10);
+  --purple-dim: rgba(91,63,126,0.10);
+
+  --teal-border:   rgba(13,110,110,0.30);
+  --amber-border:  rgba(181,84,10,0.30);
+  --rose-border:   rgba(139,38,53,0.30);
+  --sage-border:   rgba(74,103,65,0.30);
+  --purple-border: rgba(91,63,126,0.30);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 15px; }
+
+body {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* SVG noise texture */
+#noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0.03;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--paper); }
+::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 2px; }
+
+/* ── SHELL ──────────────────────────────────── */
+#shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: 52px 1fr;
+  grid-template-areas: "topbar topbar" "sidebar main";
+  height: 100vh;
+  overflow: hidden;
+  transition: grid-template-columns 0.22s ease;
+}
+#shell.collapsed { grid-template-columns: 0px 1fr; }
+
+/* ── TOPBAR ─────────────────────────────────── */
+#topbar {
+  grid-area: topbar;
+  background: rgba(245,240,233,0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  z-index: 100;
+  position: sticky;
+  top: 0;
+}
+.topbar-left  { display: flex; align-items: center; gap: 12px; }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+
+.topbar-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+.pulse-dot {
+  width: 7px; height: 7px; background: var(--teal); border-radius: 50%;
+  animation: pulse-dot 2.2s ease-in-out infinite;
+}
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+.topbar-wordmark {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.1em;
+  color: var(--ink);
+}
+.topbar-divider { width: 1px; height: 18px; background: var(--rule); }
+.topbar-view {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ink-lt);
+  position: absolute; left: 50%; transform: translateX(-50%);
+}
+.topbar-chip {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 3px;
+  background: var(--paper-dk); border: 1px solid var(--rule);
+  color: var(--ink-lt);
+}
+.topbar-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: var(--ink-lt); letter-spacing: 0.03em;
+}
+
+/* ── SIDEBAR TOGGLE ─────────────────────────── */
+#sidebar-toggle {
+  position: fixed; left: 228px; top: 50%; transform: translateY(-50%);
+  width: 14px; height: 36px;
+  background: var(--paper); border: 1px solid var(--rule); border-left: none;
+  border-radius: 0 4px 4px 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: var(--ink-lt);
+  z-index: 200; transition: left 0.22s ease;
+}
+#shell.collapsed #sidebar-toggle { left: 0px; }
+
+/* ── SIDEBAR ────────────────────────────────── */
+#sidebar {
+  grid-area: sidebar;
+  background: var(--paper);
+  border-right: 1px solid var(--rule);
+  overflow-y: auto; overflow-x: hidden;
+  transition: opacity 0.2s ease;
+}
+#shell.collapsed #sidebar { opacity: 0; pointer-events: none; }
+
+.sidebar-inner { padding: 14px 0; min-width: 240px; }
+
+.sidebar-section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-lt); padding: 0 14px 7px; margin-top: 10px;
+}
+
+.brief-card {
+  padding: 10px 14px; cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: background 0.13s; position: relative;
+}
+.brief-card:hover { background: var(--paper-dk); }
+.brief-card.active { border-left-color: var(--teal); background: rgba(13,110,110,0.05); }
+.brief-card-title {
+  font-size: 11px; font-weight: 500; color: rgba(26,22,18,0.6);
+  line-height: 1.4; margin-bottom: 2px;
+}
+.brief-card.active .brief-card-title { color: var(--ink); font-weight: 600; }
+.brief-card-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: var(--ink-lt); letter-spacing: 0.02em;
+}
+.new-dot {
+  width: 5px; height: 5px; background: var(--rose); border-radius: 50%;
+  position: absolute; top: 10px; right: 12px;
+  animation: pulse-dot 2.5s ease-in-out infinite;
+}
+
+.sidebar-rule { height: 1px; background: var(--rule); margin: 10px 14px; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 14px;
+  cursor: pointer; font-size: 11px; font-weight: 500;
+  color: rgba(26,22,18,0.5); transition: background 0.13s, color 0.13s;
+  text-decoration: none;
+}
+.nav-item:hover { background: var(--paper-dk); color: var(--ink); }
+.nav-item.active { color: var(--ink); background: rgba(13,110,110,0.06); font-weight: 600; }
+.nav-icon { font-size: 12px; width: 14px; text-align: center; opacity: 0.7; }
+.nav-item.active .nav-icon { opacity: 1; }
+
+/* ── MAIN ───────────────────────────────────── */
+#main { grid-area: main; overflow-y: auto; background: var(--cream); }
+.view { display: none; }
+.view.active { display: block; }
+.brief-content { display: none; }
+.brief-content.active { display: block; }
+
+/* ── SIGNAL BANNER ──────────────────────────── */
+.signal-banner {
+  background: var(--paper-dk); border-bottom: 1px solid var(--rule);
+  padding: 9px 36px; display: flex; align-items: center; gap: 10px;
+}
+.signal-banner-dot {
+  width: 6px; height: 6px; background: var(--teal); border-radius: 50%; flex-shrink: 0;
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+.signal-banner-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--ink-mid); line-height: 1.5;
+}
+.signal-banner-text strong { color: var(--ink); }
+
+/* ── BRIEF VIEW ─────────────────────────────── */
+#view-brief { max-width: 800px; margin: 0 auto; padding: 32px 40px 100px; }
+
+.brief-eyebrow { display: flex; align-items: center; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+
+.tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 3px;
+}
+.tag-outline   { border: 1px solid var(--rule); color: var(--ink-lt); }
+.tag-urgent    { background: var(--rose-dim); border: 1px solid var(--rose-border); color: var(--rose); }
+.tag-caution   { background: var(--amber-dim); border: 1px solid var(--amber-border); color: var(--amber); }
+.tag-provider  { background: var(--teal-dim); border: 1px solid var(--teal-border); color: var(--teal); }
+.tag-patient   { background: var(--sage-dim); border: 1px solid var(--sage-border); color: var(--sage); }
+.tag-payer     { background: var(--amber-dim); border: 1px solid var(--amber-border); color: var(--amber); }
+.tag-competitive { background: var(--rose-dim); border: 1px solid var(--rose-border); color: var(--rose); }
+.tag-platform  { background: var(--purple-dim); border: 1px solid var(--purple-border); color: var(--purple); }
+
+.eyebrow-date {
+  margin-left: auto;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--ink-lt);
+}
+
+.brief-headline {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 26px; font-weight: 700; color: var(--ink);
+  line-height: 1.35; letter-spacing: -0.01em; margin-bottom: 16px;
+}
+.brief-headline em { font-style: italic; }
+
+.brief-lede {
+  font-size: 14px; font-weight: 400; color: var(--ink-lt);
+  line-height: 1.85; max-width: 66ch; margin-bottom: 18px;
+}
+
+.brief-meta {
+  display: flex; align-items: flex-start; gap: 24px; flex-wrap: wrap;
+  padding: 14px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  margin-bottom: 24px;
+}
+.meta-item { display: flex; flex-direction: column; gap: 3px; }
+.meta-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-lt);
+}
+.meta-value { font-size: 12px; font-weight: 700; color: var(--ink); }
+.meta-value.warn { color: var(--amber); }
+.meta-value.red  { color: var(--rose); }
+.meta-value.dim  { color: var(--ink-lt); font-weight: 400; }
+.meta-value.teal { color: var(--teal); }
+
+.situation-room {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-top: 2px solid var(--ink);
+  border-radius: 6px; padding: 18px 22px; margin-bottom: 30px;
+}
+.situation-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink); margin-bottom: 10px;
+}
+.situation-body { font-size: 13px; line-height: 1.85; color: var(--ink-lt); }
+.situation-body strong { color: var(--ink); font-weight: 600; }
+
+.section-rule { height: 1px; background: var(--rule); margin: 30px 0; }
+
+.brief-section { opacity: 0; transform: translateY(8px); animation: fadeUp 0.35s ease forwards; }
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+.section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.section-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.1em; color: var(--ink-lt);
+  display: flex; align-items: center; gap: 6px;
+}
+.section-num::before { content: ''; display: inline-block; width: 18px; height: 1px; background: var(--rule); }
+
+.community-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 3px;
+}
+.cl-provider { background: var(--teal-dim); color: var(--teal); border: 1px solid var(--teal-border); }
+.cl-patient  { background: var(--sage-dim);  color: var(--sage);  border: 1px solid var(--sage-border); }
+.cl-payer    { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-border); }
+.cl-competitive { background: var(--rose-dim); color: var(--rose); border: 1px solid var(--rose-border); }
+
+.signal-chip {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.04em;
+  padding: 2px 7px; border-radius: 3px;
+}
+.sc-acc  { background: var(--sage-dim);  color: var(--sage);  border: 1px solid var(--sage-border); }
+.sc-hot  { background: var(--rose-dim);  color: var(--rose);  border: 1px solid var(--rose-border); }
+.sc-warm { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-border); }
+.sc-new  { background: var(--teal-dim);  color: var(--teal);  border: 1px solid var(--teal-border); }
+
+.section-h2 {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 18px; font-weight: 700; color: var(--ink);
+  line-height: 1.4; margin-bottom: 12px;
+}
+.section-h2 em { font-style: italic; }
+
+.section-body { font-size: 13px; line-height: 1.85; color: var(--ink-lt); margin-bottom: 14px; }
+
+.pull-quote {
+  border-left: 2px solid var(--ink); background: var(--paper);
+  padding: 14px 18px; margin: 16px 0; border-radius: 0 5px 5px 0;
+}
+.pull-quote-text {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 13px; font-style: italic; color: rgba(26,22,18,0.72); line-height: 1.8;
+  margin-bottom: 8px;
+}
+.pull-quote-cite {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: var(--ink-lt); letter-spacing: 0.02em;
+}
+
+.fvq {
+  background: rgba(181,84,10,0.05); border-left: 2px solid var(--amber);
+  padding: 13px 16px; border-radius: 0 5px 5px 0; margin-top: 16px;
+}
+.fvq-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--amber); margin-bottom: 6px;
+}
+.fvq-text { font-size: 12px; font-style: italic; color: var(--ink-lt); line-height: 1.65; }
+
+/* Action buttons */
+.action-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 16px; }
+.action-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.05em;
+  padding: 5px 10px; border-radius: 4px; cursor: pointer;
+  transition: background 0.13s, color 0.13s; border: 1px solid var(--rule);
+  background: var(--paper); color: var(--ink-lt);
+}
+.action-btn:hover { border-color: var(--ink-mid); color: var(--ink); background: var(--paper-dk); }
+.action-btn.primary { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+.action-btn.primary:hover { opacity: 0.85; }
+.action-btn.defend { background: var(--rose-dim); border-color: var(--rose-border); color: var(--rose); }
+.action-btn.defend:hover { background: rgba(139,38,53,0.18); }
+
+/* Defend This overlay */
+#overlay { position: fixed; inset: 0; background: rgba(26,22,18,0.4); z-index: 1000; display: none; align-items: center; justify-content: center; }
+#overlay.open { display: flex; }
+.overlay-panel {
+  background: var(--cream); border: 1px solid var(--rule);
+  border-top: 2px solid var(--ink);
+  border-radius: 7px; padding: 26px 30px; max-width: 480px; width: 92%;
+  box-shadow: 0 24px 64px rgba(26,22,18,0.18);
+}
+.overlay-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--teal); margin-bottom: 8px;
+}
+.overlay-heading {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 8px; line-height: 1.35;
+}
+.overlay-subtext { font-size: 12px; color: var(--ink-lt); line-height: 1.65; margin-bottom: 18px; }
+.confidence-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.confidence-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: var(--ink-lt); min-width: 100px;
+}
+.confidence-bar-wrap { flex: 1; height: 4px; background: var(--rule); border-radius: 2px; }
+.confidence-bar { height: 100%; border-radius: 2px; background: var(--teal); width: 0%; transition: width 0.6s ease; }
+.confidence-pct {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 500; color: var(--teal); min-width: 36px; text-align: right;
+}
+.overlay-forecast { font-size: 12px; color: var(--ink-lt); line-height: 1.7; margin-bottom: 18px; font-style: italic; }
+.overlay-buttons { display: flex; gap: 8px; }
+.btn-close { background: none; border: 1px solid var(--rule); border-radius: 5px; padding: 8px 16px; font-size: 12px; color: var(--ink-lt); cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-close:hover { border-color: var(--ink); color: var(--ink); }
+.btn-flag { background: var(--ink); border: none; border-radius: 5px; padding: 8px 16px; font-size: 12px; color: var(--cream); cursor: pointer; font-weight: 600; font-family: 'DM Sans', sans-serif; }
+.btn-flag:hover { opacity: 0.88; }
+
+/* Bottom line */
+.bottom-line {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-left: 3px solid var(--ink);
+  border-radius: 0 7px 7px 0; padding: 20px 24px; margin-top: 30px;
+}
+.bottom-line-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.bottom-line-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink);
+}
+.bottom-line-items { display: flex; flex-direction: column; gap: 14px; }
+.bottom-line-item { display: flex; gap: 14px; }
+.bl-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; font-weight: 500; color: var(--ink); flex-shrink: 0; min-width: 24px;
+}
+.bl-text { font-size: 13px; color: var(--ink-lt); line-height: 1.75; }
+
+.brief-footer {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 22px 0 0; border-top: 1px solid var(--rule); margin-top: 30px;
+  flex-wrap: wrap; gap: 12px;
+}
+.footer-sources {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: var(--ink-lt); line-height: 1.65;
+}
+.footer-disc {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; color: rgba(122,110,101,0.6); text-align: right; max-width: 280px; line-height: 1.5;
+}
+
+/* ── SIGNAL VELOCITY VIEW ─────────────────── */
+#view-velocity { padding: 32px 36px 100px; max-width: 920px; margin: 0 auto; }
+
+.vel-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 26px; flex-wrap: wrap; gap: 12px; }
+.vel-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 22px; font-weight: 700; color: var(--ink); margin-bottom: 4px;
+}
+.vel-subtitle { font-size: 12px; color: var(--ink-lt); }
+
+.vel-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 26px; }
+.vel-stat { background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px; }
+.vel-stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--ink-lt); margin-bottom: 6px;
+}
+.vel-stat-value { font-size: 24px; font-weight: 700; color: var(--ink); font-family: 'Libre Baskerville', serif; }
+.vel-stat-value.teal  { color: var(--teal); }
+.vel-stat-value.amber { color: var(--amber); }
+.vel-stat-value.rose  { color: var(--rose); }
+
+/* Velocity track — expanded community breakdown */
+.vel-track {
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 7px;
+  padding: 18px 20px; margin-bottom: 12px;
+}
+.vel-track-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+.vel-track-title-wrap { display: flex; flex-direction: column; gap: 4px; }
+.vel-track-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+.vel-track-cat {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: var(--ink-lt);
+}
+.vel-track-badge { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.vel-badge-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.05em;
+  padding: 2px 7px; border-radius: 3px;
+}
+.vb-new  { background: var(--teal-dim);  color: var(--teal);  border: 1px solid var(--teal-border); }
+.vb-acc  { background: var(--sage-dim);  color: var(--sage);  border: 1px solid var(--sage-border); }
+.vb-hard { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-border); }
+.vb-watch { background: rgba(91,63,126,0.10); color: var(--purple); border: 1px solid rgba(91,63,126,0.30); }
+
+.vel-comm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.vel-comm-row { display: flex; flex-direction: column; gap: 5px; }
+.vel-comm-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; font-weight: 500; letter-spacing: 0.04em;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.vel-comm-name { color: var(--ink-lt); }
+.vel-comm-delta { font-weight: 500; }
+.delta-pos { color: var(--sage); }
+.delta-hot { color: var(--rose); }
+.delta-neu { color: var(--ink-lt); }
+
+.vel-bar-wrap { display: flex; align-items: center; gap: 6px; }
+.vel-bar-track { flex: 1; height: 4px; background: var(--rule); border-radius: 2px; overflow: hidden; }
+.vel-bar-fill  { height: 100%; border-radius: 2px; transition: width 0.7s ease; }
+.vf-provider { background: var(--teal); }
+.vf-patient  { background: var(--sage); }
+.vf-payer    { background: var(--amber); }
+.vf-competitive { background: var(--rose); }
+
+.vel-bar-pct {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 500; min-width: 40px; text-align: right;
+}
+.pct-provider { color: var(--teal); }
+.pct-patient  { color: var(--sage); }
+.pct-payer    { color: var(--amber); }
+.pct-competitive { color: var(--rose); }
+
+.vel-reading {
+  font-size: 12px; color: var(--ink-lt); line-height: 1.65;
+  padding-top: 10px; border-top: 1px solid var(--rule);
+}
+
+/* ── NARRATIVE MAP VIEW ──────────────────── */
+#view-narrative { padding: 32px 36px 100px; max-width: 920px; margin: 0 auto; }
+
+.narr-header { margin-bottom: 26px; }
+.narr-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 22px; font-weight: 700; color: var(--ink); margin-bottom: 4px;
+}
+.narr-subtitle { font-size: 12px; color: var(--ink-lt); }
+
+.narr-legend { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 22px; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--ink-lt); }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+.narr-map-container {
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 7px;
+  padding: 22px; margin-bottom: 24px; overflow: hidden;
+}
+
+.narr-detail { display: none; }
+.narr-detail.active { display: block; }
+.narr-detail-card {
+  background: var(--paper); border: 1px solid var(--rule);
+  border-top: 2px solid var(--ink); border-radius: 0 0 7px 7px;
+  padding: 20px 24px; margin-top: -1px;
+}
+.narr-detail-name {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 6px;
+}
+.narr-detail-tension {
+  font-size: 13px; color: var(--ink-lt); line-height: 1.7; margin-bottom: 12px;
+  font-style: italic;
+}
+.narr-detail-meta { display: flex; align-items: center; gap: 10px; }
+
+.narr-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.narr-card { background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: 14px; cursor: pointer; transition: background 0.13s; }
+.narr-card:hover { background: var(--paper-dk); }
+.narr-card.active { border-color: var(--teal); background: rgba(13,110,110,0.04); }
+.narr-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.narr-card-name { font-size: 11px; font-weight: 600; color: var(--ink); }
+.narr-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; font-weight: 500; letter-spacing: 0.04em; padding: 2px 6px; border-radius: 3px;
+}
+.nb-gap   { background: var(--rose-dim);   color: var(--rose);   border: 1px solid var(--rose-border); }
+.nb-div   { background: var(--amber-dim);  color: var(--amber);  border: 1px solid var(--amber-border); }
+.nb-watch { background: rgba(91,63,126,0.10); color: var(--purple); border: 1px solid rgba(91,63,126,0.30); }
+.nb-stable { background: var(--teal-dim); color: var(--teal); border: 1px solid var(--teal-border); }
+.narr-card-body { font-size: 11px; color: var(--ink-lt); line-height: 1.65; }
+
+/* ── PLATFORM VIEW ───────────────────────── */
+#view-platform { padding: 32px 36px 100px; max-width: 700px; margin: 0 auto; display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 52px); }
+.platform-placeholder { text-align: center; }
+.platform-icon { font-size: 40px; margin-bottom: 16px; opacity: 0.3; }
+.platform-title { font-family: 'Libre Baskerville', serif; font-size: 20px; font-weight: 700; color: var(--ink-lt); margin-bottom: 8px; }
+.platform-subtitle { font-size: 13px; color: var(--ink-lt); }
+
+/* ── RESPONSIVE ─────────────────────────── */
+@media (max-width: 720px) {
+  #shell { grid-template-columns: 0px 1fr; }
+  #sidebar-toggle { display: none; }
+  #view-brief { padding: 20px 18px 80px; }
+  #view-velocity, #view-narrative { padding: 20px 18px 80px; }
+  .vel-stats { grid-template-columns: 1fr 1fr; }
+  .vel-comm-grid { grid-template-columns: 1fr; }
+  .narr-cards { grid-template-columns: 1fr; }
+  .brief-headline { font-size: 20px; }
+  .section-h2 { font-size: 15px; }
+  .signal-banner { padding: 9px 18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SVG noise texture -->
+<svg id="noise-overlay" xmlns="http://www.w3.org/2000/svg">
+  <filter id="noise">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>
+  <rect width="100%" height="100%" filter="url(#noise)"/>
+</svg>
+
+<div id="shell">
+
+<!-- TOPBAR -->
+<header id="topbar">
+  <div class="topbar-left">
+    <a class="topbar-logo" href="#">
+      <div class="pulse-dot"></div>
+      <span class="topbar-wordmark">AURIVIAN&nbsp;·&nbsp;PULSE</span>
+    </a>
+    <div class="topbar-divider"></div>
+    <span class="topbar-chip">Dyne</span>
+    <span class="topbar-chip">Rare Neuromuscular</span>
+    <span class="topbar-date">Wed, June 11 2026</span>
+  </div>
+  <span class="topbar-view" id="topbar-view-name">Morning Brief</span>
+  <div class="topbar-right">
+    <button class="action-btn" onclick="openPersona()">Personalize</button>
+  </div>
+</header>
+
+<!-- SIDEBAR TOGGLE -->
+<button id="sidebar-toggle" onclick="toggleSidebar()">&#8249;</button>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-inner">
+    <div class="sidebar-section-label">This Week</div>
+    <div class="brief-card active" onclick="switchBrief(this, 'main')">
+      <div class="new-dot"></div>
+      <div class="brief-card-title">ACHIEVE Readout Expectations Forming — Patient Community Alert</div>
+      <div class="brief-card-meta">Jun 11 · 4 signals · [new]</div>
+    </div>
+    <div class="brief-card" onclick="switchBrief(this, 'wms')">
+      <div class="brief-card-title">WMS 2026: Gene Therapy Narrative Dominance</div>
+      <div class="brief-card-meta">Jun 9 · 3 signals</div>
+    </div>
+    <div class="brief-card" onclick="switchBrief(this, 'payer')">
+      <div class="brief-card-title">Ultra-Rare Payer Framework Construction — Dyne Absent</div>
+      <div class="brief-card-meta">Jun 6 · 2 signals</div>
+    </div>
+
+    <div class="sidebar-rule"></div>
+    <div class="sidebar-section-label">Last Month</div>
+    <div class="brief-card" onclick="switchBrief(this, 'mechanism')">
+      <div class="brief-card-title">FORCE™ Mechanism Awareness Baseline</div>
+      <div class="brief-card-meta">May 29 · historical</div>
+    </div>
+    <div class="brief-card" onclick="switchBrief(this, 'dmd')">
+      <div class="brief-card-title">DMD Competitive Landscape Shift Post-Elevidys</div>
+      <div class="brief-card-meta">May 18 · competitive</div>
+    </div>
+    <div class="brief-card" onclick="switchBrief(this, 'dm1expect')">
+      <div class="brief-card-title">DM1 Patient Expectation Analysis</div>
+      <div class="brief-card-meta">May 8 · patient signal</div>
+    </div>
+
+    <div class="sidebar-rule"></div>
+    <div class="sidebar-section-label">Intelligence</div>
+    <div class="nav-item active" id="nav-brief" onclick="showView('brief', this)"><span class="nav-icon">&#8801;</span> Morning Brief</div>
+    <div class="nav-item" id="nav-velocity" onclick="showView('velocity', this)"><span class="nav-icon">&#8725;</span> Signal Velocity</div>
+    <div class="nav-item" id="nav-narrative" onclick="showView('narrative', this)"><span class="nav-icon">&#9678;</span> Narrative Map</div>
+    <div class="sidebar-rule"></div>
+    <div class="sidebar-section-label">Platform</div>
+    <div class="nav-item" id="nav-platform" onclick="showView('platform', this)"><span class="nav-icon">&#9633;</span> Platform Integration</div>
+    <div class="sidebar-rule"></div>
+    <a class="nav-item" href="https://aurivian-dyne-demo.vercel.app" target="_blank" rel="noopener noreferrer"><span class="nav-icon">&#9675;</span> Link to Aurivian</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main id="main">
+
+  <!-- ══ VIEW: MORNING BRIEF ════════════════ -->
+  <div id="view-brief" class="view active">
+
+  <!-- ─ Brief 1: Main — ACHIEVE readout (active) ─ -->
+  <div id="brief-main" class="brief-content active">
+
+    <div class="signal-banner">
+      <div class="signal-banner-dot"></div>
+      <div class="signal-banner-text"><strong>Signal update:</strong> Gene therapy narrative dominance at WMS 2026 pre-congress abstracts — 34% of neuromuscular submissions use 'curative' framing. This brief was updated 18 min ago.</div>
+    </div>
+
+    <div style="max-width:800px;margin:0 auto;padding:32px 40px 80px;">
+
+    <div class="brief-eyebrow">
+      <span class="tag tag-outline">Intelligence Brief</span>
+      <span class="tag tag-urgent">&#9679; Critical</span>
+      <span class="tag tag-platform">FORCE&#8482; Platform</span>
+      <span class="eyebrow-date">June 11, 2026 &middot; 6:00 AM ET</span>
+    </div>
+
+    <h1 class="brief-headline">
+      The ACHIEVE readout window is 6 months away. <em>The DM1 narrative is being written without Dyne's voice in it.</em>
+    </h1>
+
+    <p class="brief-lede">DYNE-101's Phase 3 ACHIEVE trial readout is the most important catalytic event in DM1 in a decade. But the conversation about DM1 treatment expectations is being shaped right now — in patient forums, neurologist roundtables, and WMS abstract submissions — before the data exists. The field is not waiting. Here is what the four communities are saying.</p>
+
+    <div class="brief-meta">
+      <div class="meta-item"><span class="meta-label">Platform</span><span class="meta-value">FORCE&#8482; RNA-Targeting</span></div>
+      <div class="meta-item"><span class="meta-label">Programs</span><span class="meta-value dim">DM1 · DMD · Pompe · FSHD</span></div>
+      <div class="meta-item"><span class="meta-label">Urgency</span><span class="meta-value red">&#9679; Critical</span></div>
+      <div class="meta-item"><span class="meta-label">Catalytic Event</span><span class="meta-value warn">ACHIEVE Readout H2 2026</span></div>
+    </div>
+
+    <div class="situation-room">
+      <div class="situation-label">&#9679; Central Tension &nbsp;&middot;&nbsp; 4 Communities Converging</div>
+      <p class="situation-body"><strong>The central tension:</strong> Dyne's platform differentiation (skeletal muscle tissue selectivity) is a scientific argument that has not yet become a clinical narrative. Meanwhile, gene therapy is capturing 'curative' framing across neuromuscular diseases — including DMD and DM1 — setting an expectation bar that RNA-targeting approaches will need to address in the context of their mechanism, not compete against.</p>
+    </div>
+
+    <!-- SECTION 1: PROVIDERS -->
+    <div class="brief-section" style="animation-delay:0.05s">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <span class="community-label cl-provider">Providers</span>
+        <span class="signal-chip sc-acc">&#8593; Accelerating Signal</span>
+      </div>
+      <h2 class="section-h2">Neuromuscular specialists are building DM1 expectations around ACHIEVE. <em>The data package narrative needs to start before the data.</em></h2>
+
+      <p class="section-body">WMS 2026 pre-congress abstract submission analysis shows DM1 is the most discussed rare neuromuscular indication by abstract volume, up 34% vs WMS 2025. Three academic medical centers with high DM1 patient volumes have begun actively counseling patients on the ACHIEVE trial timeline — creating treatment expectation conversations that will precede the readout by 3–6 months. The specialists leading these conversations have not received pre-readout educational materials from Dyne.</p>
+
+      <p class="section-body">The opportunity is the positioning window. When a neurologist counsels a DM1 patient about ACHIEVE, they are simultaneously forming their own opinion about FORCE™ mechanism plausibility. Three conversations are happening in that moment: What does the data need to show? What does 'meaningful' look like for this patient? And is RNA-targeting a mechanism worth believing in? All three are shaped by information that exists now — before the readout.</p>
+
+      <div class="pull-quote">
+        <p class="pull-quote-text">"My DM1 patients ask me every visit whether ACHIEVE has any news. I tell them what I know, which isn't much. I'd rather be telling them something clinical."</p>
+        <span class="pull-quote-cite">Neuromuscular specialist &middot; MDA symposium informal commentary &middot; May 2026</span>
+      </div>
+
+      <div class="fvq">
+        <div class="fvq-label">&#8594; Field Validation Question</div>
+        <p class="fvq-text">When counseling DM1 patients about the ACHIEVE readout, what endpoints are they prioritizing — and how are you currently explaining the FORCE™ mechanism and what a 'meaningful' result looks like?</p>
+      </div>
+
+      <div class="action-row">
+        <button class="action-btn defend" onclick="openDefend('provider')">Defend This</button>
+        <button class="action-btn" onclick="openDefend('provider')">What Does This Foretell?</button>
+        <button class="action-btn">Flag for DM1 MSL Team</button>
+        <button class="action-btn">Preview ACHIEVE Trial Context</button>
+      </div>
+    </div>
+
+    <div class="section-rule"></div>
+
+    <!-- SECTION 2: PATIENTS -->
+    <div class="brief-section" style="animation-delay:0.10s">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <span class="community-label cl-patient">Patients</span>
+        <span class="signal-chip sc-new">&#9679; New Narrative</span>
+      </div>
+      <h2 class="section-h2">DM1 patient communities are tracking ACHIEVE with clinical sophistication. <em>They are forming pass/fail criteria without guidance.</em></h2>
+
+      <p class="section-body">MyDM1 Foundation forum and DM1 patient group monitoring shows an acceleration in ACHIEVE-related discussion over the past 8 weeks — 89 posts referencing the trial directly, up from 12 in the prior 8 weeks. Patient posts show a high level of clinical literacy: discussions reference specific endpoints (MIRS score, hand grip strength, gait), trial phase and design, and comparisons to prior failed trials. This community is forming independent expectations.</p>
+
+      <p class="section-body">The strategic risk is expectation misalignment. Patient communities are setting a pass/fail bar that may not match the trial's pre-specified primary endpoint. Three recurring themes in patient posts: "will this stop disease progression?" (not the primary endpoint), "will it work in all DM1 subtypes?" (trial enrolled classic DM1 primarily), and "how fast will it become available?" (approval pathway questions). None of these are being guided by current Dyne medical communications.</p>
+
+      <div class="pull-quote">
+        <p class="pull-quote-text">"I've been in three failed trials. I'm not getting my hopes up about ACHIEVE until someone explains to me why FORCE is different from what we've seen before."</p>
+        <span class="pull-quote-cite">DM1 patient &middot; MyDM1 Foundation forum &middot; June 2026</span>
+      </div>
+
+      <div class="fvq">
+        <div class="fvq-label">&#8594; Field Validation Question</div>
+        <p class="fvq-text">What does your DM1 patient community understand about the FORCE™ mechanism and ACHIEVE endpoints — and what questions are they asking that you don't currently have educational materials to support?</p>
+      </div>
+
+      <div class="action-row">
+        <button class="action-btn defend" onclick="openDefend('patient')">Defend This</button>
+        <button class="action-btn" onclick="openDefend('patient')">What Does This Foretell?</button>
+        <button class="action-btn">Flag for Patient Advocacy</button>
+        <button class="action-btn">Explore DM1 Forum Signals</button>
+      </div>
+    </div>
+
+    <div class="section-rule"></div>
+
+    <!-- SECTION 3: PAYERS -->
+    <div class="brief-section" style="animation-delay:0.15s">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <span class="community-label cl-payer">Payers</span>
+        <span class="signal-chip sc-warm">&#8593; Accelerating Signal</span>
+      </div>
+      <h2 class="section-h2">Ultra-rare disease payers are building DMD/DM1 pricing frameworks now. <em>Dyne is not in that conversation.</em></h2>
+
+      <p class="section-body">Post-Elevidys approval (Sarepta's DMD gene therapy, $3.2M), major PBMs and state Medicaid programs began building ultra-rare neuromuscular disease coverage frameworks. These frameworks are designed to handle multiple approvals across DMD, DM1, and Pompe — and they are being constructed with gene therapy economics as the reference point. RNA-targeting therapies like DYNE-251 and DYNE-101 will be evaluated against a framework designed for a different mechanism and a different cost structure.</p>
+
+      <p class="section-body">The access challenge is being architected without Dyne input. ICER and pharmacy benefit frameworks for rare neuromuscular disease are referencing Elevidys ($3.2M), Zolgensma ($2.1M SMA), and Skyclarys (FA, $371K/year) as pricing anchors. An RNA-targeting therapy entering this landscape with a lower (but still premium) price point will be evaluated against gene therapy cost-effectiveness assumptions — not against its own mechanism-appropriate framework. The health economics argument for FORCE™ tissue selectivity has not been made.</p>
+
+      <div class="pull-quote">
+        <p class="pull-quote-text">"We've built our rare neuromuscular framework around gene therapy economics. An RNA therapy would need to explain to me why its cost-effectiveness model is different from the gene therapy reference point before I could evaluate it on its own terms."</p>
+        <span class="pull-quote-cite">PBM rare disease pharmacy director &middot; AMCP 2026</span>
+      </div>
+
+      <div class="fvq">
+        <div class="fvq-label">&#8594; Field Validation Question</div>
+        <p class="fvq-text">Is your institution engaged in any payer or ICER discussions about DM1 or DMD coverage frameworks — and is the FORCE™ mechanism being represented in those discussions?</p>
+      </div>
+
+      <div class="action-row">
+        <button class="action-btn defend" onclick="openDefend('payer')">Defend This</button>
+        <button class="action-btn" onclick="openDefend('payer')">What Does This Foretell?</button>
+        <button class="action-btn">Flag for Market Access</button>
+        <button class="action-btn">Pull Payer Framework Analysis</button>
+      </div>
+    </div>
+
+    <div class="section-rule"></div>
+
+    <!-- SECTION 4: COMPETITIVE -->
+    <div class="brief-section" style="animation-delay:0.20s">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <span class="community-label cl-competitive">Competitive</span>
+        <span class="signal-chip sc-hot">&#8593; Accelerating Signal</span>
+      </div>
+      <h2 class="section-h2">Gene therapy is capturing the 'curative' frame. <em>RNA-targeting is being positioned as the second-best option before the data exists.</em></h2>
+
+      <p class="section-body">Sarepta's Elevidys approval (DMD, micro-dystrophin gene therapy) has reshaped the narrative architecture of the entire neuromuscular disease space. At every major conference in the past 12 months, gene therapy is presented as the eventual destination — and RNA-targeting approaches are implicitly framed as bridges or alternatives for patients who can't access or tolerate gene therapy. This positioning is not driven by clinical evidence comparing the approaches. It is driven by narrative sequencing.</p>
+
+      <p class="section-body">The FORCE™ differentiation argument — skeletal muscle tissue selectivity, RNA targeting of the disease mechanism rather than compensation, potentially applicable across multiple genetic diseases — has not been presented as a competitive frame against gene therapy. It has been presented as a mechanism description. The distinction matters: a mechanism description asks "how does this work?" A competitive frame asks "why is this the right approach for this patient?" Dyne is answering the first question. The field is asking the second.</p>
+
+      <div class="pull-quote">
+        <p class="pull-quote-text">"When I explain DM1 to a family, I now have to explain gene therapy first and then explain why we're not using it. That's the order of the conversation. It wasn't that way three years ago."</p>
+        <span class="pull-quote-cite">Neuromuscular specialist &middot; WMS 2025 abstract commentary</span>
+      </div>
+
+      <div class="fvq">
+        <div class="fvq-label">&#8594; Field Validation Question</div>
+        <p class="fvq-text">In your DM1 or DMD patient discussions, at what point does gene therapy come up — and how are you currently framing the FORCE™ mechanism relative to gene therapy in those conversations?</p>
+      </div>
+
+      <div class="action-row">
+        <button class="action-btn defend" onclick="openDefend('competitive')">Defend This</button>
+        <button class="action-btn" onclick="openDefend('competitive')">What Does This Foretell?</button>
+        <button class="action-btn">Flag for MA Leadership</button>
+        <button class="action-btn">Map Competitive Landscape</button>
+      </div>
+    </div>
+
+    <div class="bottom-line">
+      <div class="bottom-line-header"><span class="bottom-line-label">&#9660; Bottom Line</span></div>
+      <div class="bottom-line-items">
+        <div class="bottom-line-item"><span class="bl-num">01</span><span class="bl-text">The ACHIEVE readout expectation conversation is happening in DM1 patient communities right now. Educational materials explaining FORCE™ mechanism, ACHIEVE endpoints, and what a meaningful result looks like — framed for patients, not investigators — need to reach the DM1 community before the readout, not after.</span></div>
+        <div class="bottom-line-item"><span class="bl-num">02</span><span class="bl-text">Payer frameworks for ultra-rare neuromuscular disease are being constructed with gene therapy as the reference point. A HEOR submission specifically making the FORCE™ tissue-selectivity cost-effectiveness argument — separate from gene therapy economics — needs to be in the ICER and PBM conversation before frameworks are finalized.</span></div>
+        <div class="bottom-line-item"><span class="bl-num">03</span><span class="bl-text">The gene therapy curative narrative is being accepted as the clinical gold standard in neuromuscular disease without a counter-frame from RNA-targeting approaches. A positioned mechanism narrative — explaining why tissue-selective RNA targeting is the right approach for systemic muscle disease, not a consolation prize — needs to be established before ACHIEVE reads out.</span></div>
+      </div>
+    </div>
+
+    <div class="brief-footer">
+      <div class="footer-sources">WMS 2026 abstract database · MyDM1 Foundation forum monitoring · ICER ultra-rare neuromuscular disease framework documents<br>MDA symposium 2026 notes · AMCP 2026 commentary · ClinicalTrials.gov ACHIEVE trial registry.<br>Note: No proprietary Dyne data used.</div>
+      <div class="footer-disc">Intelligence synthesized by Aurivian ARIA &amp; NOVA. Not for external distribution.</div>
+    </div>
+
+    </div><!-- /inner padding wrapper -->
+  </div><!-- /brief-main -->
+
+  <!-- ─ Brief 2: WMS 2026 Gene Therapy ─ -->
+  <div id="brief-wms" class="brief-content">
+    <div style="max-width:800px;margin:0 auto;padding:32px 40px 80px;">
+    <div class="brief-eyebrow">
+      <span class="tag tag-outline">Intelligence Brief</span>
+      <span class="tag tag-competitive">ARIA Signal</span>
+      <span class="tag tag-urgent">WMS 2026</span>
+      <span class="eyebrow-date">June 9, 2026 &middot; 7:00 AM ET</span>
+    </div>
+    <h1 class="brief-headline">WMS 2026 pre-congress abstracts: 34% of neuromuscular submissions use 'curative' framing. <em>Gene therapy is not sharing that language with RNA-targeting.</em></h1>
+    <p class="brief-lede">Analysis of WMS 2026 pre-congress abstract submissions shows gene therapy approaches account for 34% of neuromuscular submissions and overwhelmingly use 'curative,' 'disease-modifying,' and 'restoration' language. RNA-targeting approaches represent 11% of submissions and use mechanistic, not aspirational, language. The narrative gap is being established before the conference opens.</p>
+    <div class="brief-meta">
+      <div class="meta-item"><span class="meta-label">Gene Therapy SOV</span><span class="meta-value warn">34%</span></div>
+      <div class="meta-item"><span class="meta-label">RNA-Targeting SOV</span><span class="meta-value dim">11%</span></div>
+      <div class="meta-item"><span class="meta-label">'Curative' Language</span><span class="meta-value red">34% of submissions</span></div>
+      <div class="meta-item"><span class="meta-label">Congress</span><span class="meta-value dim">WMS 2026 · Pre-Congress</span></div>
+    </div>
+    <div class="situation-room">
+      <div class="situation-label">&#9679; Narrative Competition &nbsp;&middot;&nbsp; 3 Signals</div>
+      <p class="situation-body"><strong>The WMS picture:</strong> Gene therapy's dominance of abstract language at WMS 2026 is not accidental. Sarepta, Solid Biosciences, and Pfizer all have structured medical affairs presence driving abstract language and media coverage. RNA-targeting platforms are presenting science, not stories. <strong>Dyne's FORCE™ mechanism deserves congress-level narrative strategy at WMS — not just data presentation.</strong></p>
+    </div>
+    <div class="brief-section" style="animation-delay:0.05s">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <span class="community-label cl-competitive">Competitive</span>
+        <span class="signal-chip sc-hot">&#8593; Dominant Signal</span>
+      </div>
+      <h2 class="section-h2">Gene therapy is not just a mechanism. <em>At WMS 2026, it is a story arc — and RNA-targeting doesn't have one yet.</em></h2>
+      <p class="section-body">The 34% gene therapy abstract share at WMS 2026 understates the narrative dominance. In sessions focused on DM1, DMD, and Pompe specifically, gene therapy framing appears in more than half of invited speaker abstracts. 'Curative,' 'gene correction,' and 'permanent modification' are the dominant language clusters. 'RNA-targeting,' 'splice modulation,' and 'tissue selectivity' do not appear in any invited speaker abstract as primary claims. They appear in methodology sections.</p>
+      <div class="fvq">
+        <div class="fvq-label">&#8594; Field Validation Question</div>
+        <p class="fvq-text">At WMS 2025, did any Dyne MSL or MA representative have structured conversations with abstract presenters about the FORCE™ mechanism — or was Dyne's presence primarily data-oriented? Understanding the current congress strategy shapes what's possible at WMS 2026.</p>
+      </div>
+      <div class="action-row">
+        <button class="action-btn defend" onclick="openDefend('competitive')">Defend This</button>
+        <button class="action-btn">Flag for MA Leadership</button>
+        <button class="action-btn">WMS 2026 Abstract Analysis</button>
+      </div>
+    </div>
+    <div class="brief-footer">
+      <div class="footer-sources">WMS 2026 pre-congress abstract database · Sarepta, Solid Biosciences, Pfizer investor materials · WMS 2025 session recordings</div>
+      <div class="footer-disc">Intelligence synthesized by Aurivian ARIA. Not for external distribution.</div>
+    </div>
+    </div>
+  </div><!-- /brief-wms -->
+
+  <!-- ─ Brief 3: Payer Framework ─ -->
+  <div id="brief-payer" class="brief-content">
+    <div style="max-width:800px;margin:0 auto;padding:32px 40px 80px;">
+    <div class="brief-eyebrow">
+      <span class="tag tag-outline">Intelligence Brief</span>
+      <span class="tag tag-payer">Payer · Access</span>
+      <span class="tag tag-urgent">Structural Gap</span>
+      <span class="eyebrow-date">June 6, 2026 &middot; 7:30 AM ET</span>
+    </div>
+    <h1 class="brief-headline">Ultra-rare payer frameworks are being built now — with gene therapy economics as the reference point. <em>FORCE™ tissue selectivity has no cost-effectiveness argument in those frameworks.</em></h1>
+    <p class="brief-lede">Post-Elevidys approval, major PBMs and state Medicaid programs began constructing ultra-rare neuromuscular disease coverage frameworks. These frameworks use one-time gene therapy economics as the baseline. RNA-targeting therapies — which require chronic dosing but offer a fundamentally different risk profile and cost trajectory — are being evaluated against gene therapy comparators, not their own mechanism-appropriate health economics.</p>
+    <div class="brief-meta">
+      <div class="meta-item"><span class="meta-label">Elevidys Reference Price</span><span class="meta-value warn">$3.2M</span></div>
+      <div class="meta-item"><span class="meta-label">Zolgensma Reference</span><span class="meta-value warn">$2.1M</span></div>
+      <div class="meta-item"><span class="meta-label">Skyclarys Reference</span><span class="meta-value dim">$371K/yr</span></div>
+      <div class="meta-item"><span class="meta-label">FORCE™ HEOR in Frameworks</span><span class="meta-value red">None</span></div>
+    </div>
+    <div class="situation-room">
+      <div class="situation-label">&#9679; Access Architecture &nbsp;&middot;&nbsp; 2 Signals</div>
+      <p class="situation-body"><strong>The access picture:</strong> ICER's upcoming rare neuromuscular disease review will establish cost-effectiveness benchmarks. Without a FORCE™-specific HEOR submission that makes the tissue-selectivity, chronic-vs-one-time, and mechanism-appropriateness arguments, Dyne's therapies will be evaluated against gene therapy utility models — which are structurally disadvantageous for RNA-targeting approaches. <strong>The ICER comment period window closes before ACHIEVE reads out.</strong></p>
+    </div>
+    <div class="brief-section" style="animation-delay:0.05s">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <span class="community-label cl-payer">Payers</span>
+        <span class="signal-chip sc-warm">&#8593; Structural Hardening</span>
+      </div>
+      <h2 class="section-h2">The HEOR argument for FORCE™ tissue selectivity needs to reach ICER before the framework is set. <em>Post-ACHIEVE is too late.</em></h2>
+      <p class="section-body">ICER's methodology for ultra-rare neurological disease values treatments against QALYs in a population that is small, severely affected, and has no standard of care. This methodology is theoretically favorable for FORCE™ — but only if the tissue-selectivity argument is made explicitly. The comparative efficacy section of ICER's rare neuromuscular framework currently references only approved gene therapies and IVIg as contextual comparators. RNA-targeting therapies are not mentioned.</p>
+      <div class="fvq">
+        <div class="fvq-label">&#8594; Field Validation Question</div>
+        <p class="fvq-text">Is Dyne's market access team currently engaged with ICER's rare neuromuscular disease review process — and has the FORCE™ mechanism's tissue-selectivity economic argument been formally submitted to any payer or HTA body?</p>
+      </div>
+      <div class="action-row">
+        <button class="action-btn defend" onclick="openDefend('payer')">Defend This</button>
+        <button class="action-btn">Flag for Market Access</button>
+        <button class="action-btn">Pull ICER Framework Documents</button>
+      </div>
+    </div>
+    <div class="brief-footer">
+      <div class="footer-sources">ICER ultra-rare neuromuscular disease framework · AMCP 2026 · CMS rare disease policy materials · PBM rare disease pharmacy director commentary</div>
+      <div class="footer-disc">Intelligence synthesized by Aurivian NOVA. Not for external distribution.</div>
+    </div>
+    </div>
+  </div><!-- /brief-payer -->
+
+  <!-- ─ Brief 4–6: Last Month stubs ─ -->
+  <div id="brief-mechanism" class="brief-content">
+    <div style="max-width:800px;margin:0 auto;padding:32px 40px 80px;">
+    <div class="brief-eyebrow">
+      <span class="tag tag-outline">Intelligence Brief</span>
+      <span class="tag tag-platform">FORCE&#8482; Platform</span>
+      <span class="eyebrow-date">May 29, 2026</span>
+    </div>
+    <h1 class="brief-headline">FORCE™ Mechanism Awareness Baseline</h1>
+    <p class="brief-lede">Baseline analysis of FORCE™ mechanism awareness across neuromuscular specialist and community neurologist tiers. Academic neuromuscular specialists show moderate awareness of RNA-targeting tissue selectivity; community neurologists show low awareness. KOL understanding of skeletal muscle selectivity vs. systemic ASO approaches is the primary scientific differentiation gap identified in this baseline.</p>
+    <div class="brief-footer">
+      <div class="footer-sources">PubMed publication analysis · MSL interaction log · NOVA signal velocity analysis</div>
+      <div class="footer-disc">Historical brief. Intelligence synthesized by Aurivian NOVA.</div>
+    </div>
+    </div>
+  </div>
+
+  <div id="brief-dmd" class="brief-content">
+    <div style="max-width:800px;margin:0 auto;padding:32px 40px 80px;">
+    <div class="brief-eyebrow">
+      <span class="tag tag-outline">Intelligence Brief</span>
+      <span class="tag tag-competitive">Competitive</span>
+      <span class="eyebrow-date">May 18, 2026</span>
+    </div>
+    <h1 class="brief-headline">DMD Competitive Landscape Shift Post-Elevidys</h1>
+    <p class="brief-lede">Since Elevidys approval, DMD prescribing intent surveys show 78% of neuromuscular specialists now consider gene therapy the preferred treatment pathway for eligible patients. DYNE-251's exon 51 skip mechanism positions it for the approximately 13% of DMD patients who carry exon 51 mutations — but competitive positioning must be re-framed as a targeted mechanism story, not an either/or argument against gene therapy.</p>
+    <div class="brief-footer">
+      <div class="footer-sources">Elevidys FDA label · Sarepta Therapeutics investor materials · TREAT-NMD registry data · ARIA competitive monitoring</div>
+      <div class="footer-disc">Historical brief. Intelligence synthesized by Aurivian ARIA.</div>
+    </div>
+    </div>
+  </div>
+
+  <div id="brief-dm1expect" class="brief-content">
+    <div style="max-width:800px;margin:0 auto;padding:32px 40px 80px;">
+    <div class="brief-eyebrow">
+      <span class="tag tag-outline">Intelligence Brief</span>
+      <span class="tag tag-patient">Patients</span>
+      <span class="eyebrow-date">May 8, 2026</span>
+    </div>
+    <h1 class="brief-headline">DM1 Patient Expectation Analysis</h1>
+    <p class="brief-lede">Baseline patient expectation analysis across MyDM1 Foundation, Myotonic Dystrophy Foundation community channels, and CLINTRIALS patient advocacy groups. Key finding: DM1 patients have a high tolerance for complexity (multi-organ system awareness) but low literacy for RNA-targeting mechanisms specifically. The most common patient question — "will it stop progression?" — does not map to any currently available clinical trial endpoint in ACHIEVE.</p>
+    <div class="brief-footer">
+      <div class="footer-sources">MyDM1 Foundation forum monitoring · Myotonic Dystrophy Foundation community survey data · ACHIEVE trial registry (ClinicalTrials.gov NCT05601765)</div>
+      <div class="footer-disc">Historical brief. Intelligence synthesized by Aurivian NOVA.</div>
+    </div>
+    </div>
+  </div>
+
+  </div><!-- /view-brief -->
+
+  <!-- ══ VIEW: SIGNAL VELOCITY ══════════════ -->
+  <div id="view-velocity" class="view">
+    <div class="vel-header">
+      <div>
+        <div class="vel-title">Signal Velocity</div>
+        <div class="vel-subtitle">KIT momentum across Dyne FORCE&#8482; platform · DM1 · DMD · Pompe · FSHD · June 11, 2026</div>
+      </div>
+    </div>
+
+    <div class="vel-stats">
+      <div class="vel-stat">
+        <div class="vel-stat-label">Signals Tracked</div>
+        <div class="vel-stat-value">24</div>
+      </div>
+      <div class="vel-stat">
+        <div class="vel-stat-label">New Narrative</div>
+        <div class="vel-stat-value teal">1</div>
+      </div>
+      <div class="vel-stat">
+        <div class="vel-stat-label">Accelerating</div>
+        <div class="vel-stat-value amber">3</div>
+      </div>
+      <div class="vel-stat">
+        <div class="vel-stat-label">Structural Gap</div>
+        <div class="vel-stat-value rose">1</div>
+      </div>
+    </div>
+
+    <!-- Track 1 -->
+    <div class="vel-track">
+      <div class="vel-track-header">
+        <div class="vel-track-title-wrap">
+          <span class="vel-track-name">ACHIEVE readout anticipation — patient community</span>
+          <span class="vel-track-cat">NOVA · Patient forum monitoring · MyDM1 Foundation · DM1 advocacy groups</span>
+        </div>
+        <div class="vel-track-badge">
+          <span class="vel-badge-label vb-new">&#9679; New Narrative</span>
+        </div>
+      </div>
+      <div class="vel-comm-grid">
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Providers</span>
+            <span class="vel-comm-delta delta-pos">+180%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-provider" style="width:0%" data-w="28"></div></div>
+            <span class="vel-bar-pct pct-provider">28%</span>
+          </div>
+        </div>
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Patients</span>
+            <span class="vel-comm-delta delta-hot">+620%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-patient" style="width:0%" data-w="78"></div></div>
+            <span class="vel-bar-pct pct-patient">78%</span>
+          </div>
+        </div>
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Payers</span>
+            <span class="vel-comm-delta delta-neu">+35%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-payer" style="width:0%" data-w="12"></div></div>
+            <span class="vel-bar-pct pct-payer">12%</span>
+          </div>
+        </div>
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Competitive</span>
+            <span class="vel-comm-delta delta-pos">+95%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-competitive" style="width:0%" data-w="18"></div></div>
+            <span class="vel-bar-pct pct-competitive">18%</span>
+          </div>
+        </div>
+      </div>
+      <div class="vel-reading">Patient-generated, platform-independent. DM1 communities are tracking ACHIEVE without guidance. The expectation architecture is being built without Dyne input.</div>
+    </div>
+
+    <!-- Track 2 -->
+    <div class="vel-track">
+      <div class="vel-track-header">
+        <div class="vel-track-title-wrap">
+          <span class="vel-track-name">Gene therapy curative narrative in DM1/DMD</span>
+          <span class="vel-track-cat">ARIA · Congress monitoring · WMS 2026 pre-abstracts · Social listening · Sarepta investor materials</span>
+        </div>
+        <div class="vel-track-badge">
+          <span class="vel-badge-label vb-acc">&#8593; Accelerating</span>
+        </div>
+      </div>
+      <div class="vel-comm-grid">
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Providers</span>
+            <span class="vel-comm-delta delta-pos">+240%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-provider" style="width:0%" data-w="65"></div></div>
+            <span class="vel-bar-pct pct-provider">65%</span>
+          </div>
+        </div>
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Patients</span>
+            <span class="vel-comm-delta delta-pos">+180%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-patient" style="width:0%" data-w="55"></div></div>
+            <span class="vel-bar-pct pct-patient">55%</span>
+          </div>
+        </div>
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Payers</span>
+            <span class="vel-comm-delta delta-pos">+120%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-payer" style="width:0%" data-w="45"></div></div>
+            <span class="vel-bar-pct pct-payer">45%</span>
+          </div>
+        </div>
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Competitive</span>
+            <span class="vel-comm-delta delta-hot">+380%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-competitive" style="width:0%" data-w="88"></div></div>
+            <span class="vel-bar-pct pct-competitive">88%</span>
+          </div>
+        </div>
+      </div>
+      <div class="vel-reading">Competitive-originated, now self-sustaining. Gene therapy narrative has become the reference point that all other approaches are evaluated against.</div>
+    </div>
+
+    <!-- Track 3 -->
+    <div class="vel-track">
+      <div class="vel-track-header">
+        <div class="vel-track-title-wrap">
+          <span class="vel-track-name">FORCE&#8482; mechanism credibility signal</span>
+          <span class="vel-track-cat">NOVA · KOL publication monitoring · MSL interaction logs · PubMed RNA-targeting literature</span>
+        </div>
+        <div class="vel-track-badge">
+          <span class="vel-badge-label vb-acc">&#8593; Accelerating</span>
+        </div>
+      </div>
+      <div class="vel-comm-grid">
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Providers</span>
+            <span class="vel-comm-delta delta-pos">+195%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-provider" style="width:0%" data-w="45"></div></div>
+            <span class="vel-bar-pct pct-provider">45%</span>
+          </div>
+        </div>
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Patients</span>
+            <span class="vel-comm-delta delta-pos">+145%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-patient" style="width:0%" data-w="28"></div></div>
+            <span class="vel-bar-pct pct-patient">28%</span>
+          </div>
+        </div>
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Payers</span>
+            <span class="vel-comm-delta delta-pos">+65%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-payer" style="width:0%" data-w="18"></div></div>
+            <span class="vel-bar-pct pct-payer">18%</span>
+          </div>
+        </div>
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Competitive</span>
+            <span class="vel-comm-delta delta-pos">+110%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-competitive" style="width:0%" data-w="35"></div></div>
+            <span class="vel-bar-pct pct-competitive">35%</span>
+          </div>
+        </div>
+      </div>
+      <div class="vel-reading">Provider-driven curiosity. Scientific interest in tissue selectivity is building. The mechanism argument needs to become a clinical narrative before the readout.</div>
+    </div>
+
+    <!-- Track 4 -->
+    <div class="vel-track">
+      <div class="vel-track-header">
+        <div class="vel-track-title-wrap">
+          <span class="vel-track-name">Ultra-rare payer framework construction</span>
+          <span class="vel-track-cat">NOVA · ICER documents · AMCP 2026 commentary · PBM rare disease pharmacy director signals</span>
+        </div>
+        <div class="vel-track-badge">
+          <span class="vel-badge-label vb-hard">&#8594; Stable / Hardening</span>
+        </div>
+      </div>
+      <div class="vel-comm-grid">
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Providers</span>
+            <span class="vel-comm-delta delta-neu">+18%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-provider" style="width:0%" data-w="15"></div></div>
+            <span class="vel-bar-pct pct-provider">15%</span>
+          </div>
+        </div>
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Patients</span>
+            <span class="vel-comm-delta delta-neu">+12%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-patient" style="width:0%" data-w="8"></div></div>
+            <span class="vel-bar-pct pct-patient">8%</span>
+          </div>
+        </div>
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Payers</span>
+            <span class="vel-comm-delta delta-pos">+85%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-payer" style="width:0%" data-w="62"></div></div>
+            <span class="vel-bar-pct pct-payer">62%</span>
+          </div>
+        </div>
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Competitive</span>
+            <span class="vel-comm-delta delta-neu">+35%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-competitive" style="width:0%" data-w="25"></div></div>
+            <span class="vel-bar-pct pct-competitive">25%</span>
+          </div>
+        </div>
+      </div>
+      <div class="vel-reading">Administrative narrative. Being built without Dyne. The window to insert FORCE™-specific HEOR is 3–6 months — before frameworks are finalized.</div>
+    </div>
+
+    <!-- Track 5 -->
+    <div class="vel-track">
+      <div class="vel-track-header">
+        <div class="vel-track-title-wrap">
+          <span class="vel-track-name">DM1 natural history and patient-reported outcomes gap</span>
+          <span class="vel-track-cat">NOVA · ACHIEVE natural history arm · Patient-reported outcomes literature · MDA symposium 2026</span>
+        </div>
+        <div class="vel-track-badge">
+          <span class="vel-badge-label vb-acc">&#8593; Accelerating</span>
+        </div>
+      </div>
+      <div class="vel-comm-grid">
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Providers</span>
+            <span class="vel-comm-delta delta-pos">+165%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-provider" style="width:0%" data-w="38"></div></div>
+            <span class="vel-bar-pct pct-provider">38%</span>
+          </div>
+        </div>
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Patients</span>
+            <span class="vel-comm-delta delta-hot">+290%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-patient" style="width:0%" data-w="62"></div></div>
+            <span class="vel-bar-pct pct-patient">62%</span>
+          </div>
+        </div>
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Payers</span>
+            <span class="vel-comm-delta delta-pos">+95%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-payer" style="width:0%" data-w="28"></div></div>
+            <span class="vel-bar-pct pct-payer">28%</span>
+          </div>
+        </div>
+        <div class="vel-comm-row">
+          <div class="vel-comm-label">
+            <span class="vel-comm-name">Competitive</span>
+            <span class="vel-comm-delta delta-neu">+25%</span>
+          </div>
+          <div class="vel-bar-wrap">
+            <div class="vel-bar-track"><div class="vel-bar-fill vf-competitive" style="width:0%" data-w="12"></div></div>
+            <span class="vel-bar-pct pct-competitive">12%</span>
+          </div>
+        </div>
+      </div>
+      <div class="vel-reading">Both communities independently identifying the same gap. Real-world DM1 disease progression data, especially patient-reported, is sparse. Dyne's Phase 3 natural history arm could own this narrative.</div>
+    </div>
+
+  </div><!-- /view-velocity -->
+
+  <!-- ══ VIEW: NARRATIVE MAP ════════════════ -->
+  <div id="view-narrative" class="view">
+    <div class="narr-header">
+      <div class="narr-title">Narrative Map</div>
+      <div class="narr-subtitle">Strategic narrative landscape for Dyne FORCE&#8482; platform · June 11, 2026</div>
+    </div>
+
+    <div class="narr-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--rose)"></div>Gap Open</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Diverging</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Structural Gap</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Stable / Watching</div>
+    </div>
+
+    <div class="narr-map-container">
+      <svg width="100%" viewBox="0 0 680 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Connection lines -->
+        <line x1="170" y1="75" x2="340" y2="150" stroke="rgba(26,22,18,0.08)" stroke-width="1.5"/>
+        <line x1="170" y1="225" x2="340" y2="150" stroke="rgba(26,22,18,0.08)" stroke-width="1.5"/>
+        <line x1="510" y1="75" x2="340" y2="150" stroke="rgba(181,84,10,0.18)" stroke-width="1.5"/>
+        <line x1="510" y1="225" x2="340" y2="150" stroke="rgba(26,22,18,0.08)" stroke-width="1.5"/>
+        <!-- Center: FORCE Platform -->
+        <circle cx="340" cy="150" r="42" fill="rgba(13,110,110,0.06)" stroke="var(--teal)" stroke-width="1.5"/>
+        <text x="340" y="144" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" font-weight="500" fill="var(--teal)">FORCE&#8482;</text>
+        <text x="340" y="157" text-anchor="middle" font-family="DM Mono, monospace" font-size="9" font-weight="500" fill="var(--teal)">PLATFORM</text>
+        <!-- TL: ACHIEVE Readout -->
+        <circle cx="170" cy="75" r="34" fill="rgba(139,38,53,0.06)" stroke="var(--rose)" stroke-width="1.5"/>
+        <text x="170" y="70" text-anchor="middle" font-family="DM Mono, monospace" font-size="8" font-weight="500" fill="var(--rose)">ACHIEVE</text>
+        <text x="170" y="82" text-anchor="middle" font-family="DM Mono, monospace" font-size="8" font-weight="500" fill="var(--rose)">READOUT</text>
+        <!-- BL: Access Architecture -->
+        <circle cx="170" cy="225" r="32" fill="rgba(91,63,126,0.06)" stroke="var(--purple)" stroke-width="1.5"/>
+        <text x="170" y="220" text-anchor="middle" font-family="DM Mono, monospace" font-size="8" font-weight="500" fill="var(--purple)">ACCESS</text>
+        <text x="170" y="232" text-anchor="middle" font-family="DM Mono, monospace" font-size="8" font-weight="500" fill="var(--purple)">ARCHITECT.</text>
+        <!-- TR: Gene Therapy Frame -->
+        <circle cx="510" cy="75" r="34" fill="rgba(181,84,10,0.06)" stroke="var(--amber)" stroke-width="1.5"/>
+        <text x="510" y="70" text-anchor="middle" font-family="DM Mono, monospace" font-size="8" font-weight="500" fill="var(--amber)">GENE THERAPY</text>
+        <text x="510" y="82" text-anchor="middle" font-family="DM Mono, monospace" font-size="8" font-weight="500" fill="var(--amber)">NARRATIVE</text>
+        <!-- BR: Platform Credibility -->
+        <circle cx="510" cy="225" r="32" fill="rgba(13,110,110,0.06)" stroke="var(--teal)" stroke-width="1.5"/>
+        <text x="510" y="220" text-anchor="middle" font-family="DM Mono, monospace" font-size="8" font-weight="500" fill="var(--teal)">PLATFORM</text>
+        <text x="510" y="232" text-anchor="middle" font-family="DM Mono, monospace" font-size="8" font-weight="500" fill="var(--teal)">CREDIBILITY</text>
+      </svg>
+    </div>
+
+    <!-- Narrative detail panel (shown based on active card) -->
+    <div id="narr-detail-achieve" class="narr-detail active">
+      <div class="narr-detail-card">
+        <div class="narr-detail-name">ACHIEVE Readout Window</div>
+        <div class="narr-detail-tension">"Expectations forming without guidance. Patient and provider narratives will calcify before the data exists."</div>
+        <div class="narr-detail-meta">
+          <span class="narr-badge nb-gap">&#8593; Gap Open</span>
+          <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--ink-lt);margin-left:8px">H2 2026 · DM1 Phase 3 · 4 communities active</span>
+        </div>
+      </div>
+    </div>
+    <div id="narr-detail-genetherapy" class="narr-detail">
+      <div class="narr-detail-card">
+        <div class="narr-detail-name">Gene Therapy vs RNA-Targeting Frame</div>
+        <div class="narr-detail-tension">"Gene therapy is the reference narrative. RNA-targeting is responding to it rather than establishing its own frame."</div>
+        <div class="narr-detail-meta">
+          <span class="narr-badge nb-div">&#8596; Diverging</span>
+          <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--ink-lt);margin-left:8px">Elevidys anchored · WMS 2026 · MDA 2026</span>
+        </div>
+      </div>
+    </div>
+    <div id="narr-detail-access" class="narr-detail">
+      <div class="narr-detail-card">
+        <div class="narr-detail-name">Ultra-Rare Access Architecture</div>
+        <div class="narr-detail-tension">"Payer frameworks are being built with gene therapy economics. FORCE™ needs its own access narrative."</div>
+        <div class="narr-detail-meta">
+          <span class="narr-badge nb-watch" style="background:rgba(91,63,126,0.10);color:var(--purple);border:1px solid rgba(91,63,126,0.30)">&#8593; Structural Gap</span>
+          <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--ink-lt);margin-left:8px">ICER review window · PBM framework construction</span>
+        </div>
+      </div>
+    </div>
+    <div id="narr-detail-platform" class="narr-detail">
+      <div class="narr-detail-card">
+        <div class="narr-detail-name">Cross-Indication Platform Credibility</div>
+        <div class="narr-detail-tension">"DM1 readout is the credibility anchor for all four FORCE™ programs. Platform story rises or falls with ACHIEVE."</div>
+        <div class="narr-detail-meta">
+          <span class="narr-badge nb-stable">&#8594; Stable / Watching</span>
+          <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--ink-lt);margin-left:8px">DM1 · DMD · Pompe · FSHD · contingent on ACHIEVE</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="narr-cards" style="margin-top:16px;">
+      <div class="narr-card active" id="ncard-achieve" onclick="activateNarr('achieve')">
+        <div class="narr-card-header">
+          <span class="narr-card-name">ACHIEVE Readout Window</span>
+          <span class="narr-badge nb-gap">&#8593; Gap Open</span>
+        </div>
+        <p class="narr-card-body">Expectations forming without guidance. Patient and provider narratives will calcify before the data exists. 4 communities active. 6-month window.</p>
+      </div>
+      <div class="narr-card" id="ncard-genetherapy" onclick="activateNarr('genetherapy')">
+        <div class="narr-card-header">
+          <span class="narr-card-name">Gene Therapy vs RNA-Targeting Frame</span>
+          <span class="narr-badge nb-div">&#8596; Diverging</span>
+        </div>
+        <p class="narr-card-body">Gene therapy is the reference narrative. RNA-targeting is responding to it rather than establishing its own frame. WMS 2026 reinforcing this.</p>
+      </div>
+      <div class="narr-card" id="ncard-access" onclick="activateNarr('access')">
+        <div class="narr-card-header">
+          <span class="narr-card-name">Ultra-Rare Access Architecture</span>
+          <span class="narr-badge" style="background:rgba(91,63,126,0.10);color:var(--purple);border:1px solid rgba(91,63,126,0.30)">&#8593; Structural Gap</span>
+        </div>
+        <p class="narr-card-body">Payer frameworks are being built with gene therapy economics. FORCE™ needs its own access narrative in ICER and PBM processes now.</p>
+      </div>
+      <div class="narr-card" id="ncard-platform" onclick="activateNarr('platform')">
+        <div class="narr-card-header">
+          <span class="narr-card-name">Cross-Indication Platform Credibility</span>
+          <span class="narr-badge nb-stable">&#8594; Stable / Watching</span>
+        </div>
+        <p class="narr-card-body">DM1 readout is the credibility anchor for all four FORCE™ programs. Platform story rises or falls with ACHIEVE.</p>
+      </div>
+    </div>
+  </div><!-- /view-narrative -->
+
+  <!-- ══ VIEW: PLATFORM INTEGRATION ════════ -->
+  <div id="view-platform" class="view">
+    <div class="platform-placeholder">
+      <div class="platform-icon">&#9633;</div>
+      <div class="platform-title">Platform Integration — Coming Soon</div>
+      <div class="platform-subtitle">Direct connection to Aurivian FORCE&#8482; workspace, NOVA strategy surface, and Dyne MSL field logs.</div>
+    </div>
+  </div><!-- /view-platform -->
+
+</main>
+</div><!-- /shell -->
+
+<!-- OVERLAY: Defend This / Forecast + Persona -->
+<div id="overlay" onclick="closeOverlay()">
+  <div class="overlay-panel" id="overlay-panel" onclick="event.stopPropagation()">
+    <div class="overlay-label" id="overlay-label">Confidence Analysis</div>
+    <div class="overlay-heading" id="overlay-heading"></div>
+    <div class="overlay-subtext" id="overlay-subtext"></div>
+    <div id="confidence-rows"></div>
+    <div class="overlay-forecast" id="overlay-forecast"></div>
+    <div class="overlay-buttons">
+      <button class="btn-close" onclick="closeOverlay()">Close</button>
+      <button class="btn-flag" onclick="closeOverlay()">Flag for Team</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUDIO BAR -->
+<div id="audio-bar">
+  <button class="audio-play-btn" onclick="toggleAudio()" id="play-btn" style="width:32px;height:32px;border-radius:50%;background:var(--ink);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+    <span id="play-icon" style="font-size:11px;color:var(--cream);margin-left:2px;">&#9654;</span>
+  </button>
+  <div style="display:flex;flex-direction:column;gap:1px;min-width:160px;">
+    <div style="font-size:11px;font-weight:700;color:var(--ink);">Pulse Brief · June 11, 2026</div>
+    <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--ink-lt);">Dyne Rare Neuromuscular Intelligence</div>
+  </div>
+  <div style="flex:1;display:flex;align-items:center;gap:10px;">
+    <div id="audio-track" onclick="scrubAudio(event)" style="flex:1;height:3px;background:var(--rule);border-radius:2px;cursor:pointer;position:relative;">
+      <div id="audio-fill" style="height:100%;background:var(--ink);border-radius:2px;width:0%;transition:width 0.25s linear;"></div>
+    </div>
+    <span id="audio-time" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--ink-lt);white-space:nowrap;min-width:70px;text-align:right;">0:00</span>
+  </div>
+  <button onclick="closeAudio()" style="background:none;border:none;color:var(--ink-lt);cursor:pointer;font-size:16px;line-height:1;padding:4px;">&#215;</button>
+</div>
+<audio id="brief-audio" src="pulse_dyne_brief_audio.mp3" preload="metadata"></audio>
+
+<style>
+#audio-bar {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 500;
+  background: var(--cream); border-top: 1px solid var(--rule);
+  padding: 10px 20px;
+  align-items: center; gap: 14px;
+}
+#audio-bar.open { display: flex; }
+</style>
+
+<script>
+// ── SIDEBAR TOGGLE ──────────────────────────
+function toggleSidebar() {
+  const shell = document.getElementById('shell');
+  const btn = document.getElementById('sidebar-toggle');
+  shell.classList.toggle('collapsed');
+  btn.textContent = shell.classList.contains('collapsed') ? '›' : '‹';
+}
+
+// ── VIEW SWITCHING ──────────────────────────
+function showView(name, el) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const v = document.getElementById('view-' + name);
+  if (v) v.classList.add('active');
+  if (el) el.classList.add('active');
+  const navBrief = document.getElementById('nav-brief');
+  if (name === 'brief' && navBrief) navBrief.classList.add('active');
+  // Update topbar view name
+  const viewNames = { brief: 'Morning Brief', velocity: 'Signal Velocity', narrative: 'Narrative Map', platform: 'Platform Integration' };
+  document.getElementById('topbar-view-name').textContent = viewNames[name] || '';
+  // Animate velocity bars on first view
+  if (name === 'velocity' && !window.velocityRendered) {
+    window.velocityRendered = true;
+    setTimeout(function() {
+      document.querySelectorAll('.vel-bar-fill[data-w]').forEach(function(bar) {
+        bar.style.width = bar.getAttribute('data-w') + '%';
+      });
+    }, 120);
+  }
+}
+
+// ── BRIEF SWITCHING ─────────────────────────
+function switchBrief(card, briefId) {
+  document.querySelectorAll('.brief-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  document.querySelectorAll('.brief-content').forEach(b => b.classList.remove('active'));
+  const target = document.getElementById('brief-' + briefId);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-brief').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('nav-brief').classList.add('active');
+  document.getElementById('topbar-view-name').textContent = 'Morning Brief';
+}
+
+// ── NARRATIVE MAP ───────────────────────────
+function activateNarr(key) {
+  document.querySelectorAll('.narr-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.narr-detail').forEach(d => d.classList.remove('active'));
+  const card = document.getElementById('ncard-' + key);
+  const detail = document.getElementById('narr-detail-' + key);
+  if (card) card.classList.add('active');
+  if (detail) detail.classList.add('active');
+}
+
+// ── DEFEND THIS / FORECAST ──────────────────
+var defendData = {
+  provider: {
+    label: 'Confidence Analysis · Providers',
+    heading: 'The ACHIEVE readout expectation conversation is being shaped now — 6 months before data — and Dyne\'s voice is not in it.',
+    subtext: 'Signal sources: WMS 2026 pre-congress abstract database, MDA symposium 2026 field commentary, MSL interaction log analysis, ACHIEVE ClinicalTrials.gov monitoring.',
+    confidence: [
+      { label: 'Source corroboration', pct: 82 },
+      { label: 'Signal recurrence', pct: 76 },
+      { label: 'Field validation', pct: 68 }
+    ],
+    forecast: 'Forecast: If no pre-readout educational engagement occurs in the next 60 days, neurologist expectations for ACHIEVE will be anchored to independently-formed heuristics. Those heuristics will be harder to shift post-readout than they would be to shape now. Probability of expectation misalignment creating a post-readout interpretation gap: 71%.'
+  },
+  patient: {
+    label: 'Confidence Analysis · Patients',
+    heading: 'DM1 patient communities are forming independent pass/fail criteria for ACHIEVE without educational guidance.',
+    subtext: 'Signal sources: MyDM1 Foundation forum monitoring (89 posts, 8 weeks), Myotonic Dystrophy Foundation community channels, CLINTRIALS patient advocacy group analysis.',
+    confidence: [
+      { label: 'Forum signal volume', pct: 85 },
+      { label: 'Expectation misalignment risk', pct: 78 },
+      { label: 'Field validation', pct: 65 }
+    ],
+    forecast: 'Forecast: Patient communities setting pass/fail criteria that diverge from the trial\'s primary endpoint creates a readout interpretation risk regardless of clinical result. A positive ACHIEVE result could be framed as a failure by the DM1 patient community if "will it stop progression?" is the unanswered question. Probability of community-driven negative framing of a positive result: 58%.'
+  },
+  payer: {
+    label: 'Confidence Analysis · Payers',
+    heading: 'Ultra-rare neuromuscular payer frameworks are being built with gene therapy economics as the reference — not FORCE™ tissue-selectivity economics.',
+    subtext: 'Signal sources: ICER ultra-rare neurological disease framework documents, AMCP 2026 commentary, PBM rare disease pharmacy director signal analysis, Elevidys post-approval coverage tracking.',
+    confidence: [
+      { label: 'Framework document evidence', pct: 79 },
+      { label: 'HEOR gap confirmation', pct: 83 },
+      { label: 'Timeline urgency', pct: 74 }
+    ],
+    forecast: 'Forecast: If FORCE™-specific HEOR is not submitted to ICER before the review comment window closes, the cost-effectiveness benchmark for DYNE-101 will be set against gene therapy utility models by default. Post-review HEOR submissions have minimal influence on finalized frameworks. Window probability: 3–6 months from today.'
+  },
+  competitive: {
+    label: 'Confidence Analysis · Competitive',
+    heading: 'Gene therapy has claimed the \'curative\' narrative frame, and RNA-targeting is being positioned as the alternative rather than the right mechanism for the right disease.',
+    subtext: 'Signal sources: WMS 2026 abstract database, Sarepta investor materials, social listening (X/LinkedIn/ResearchGate), MDA symposium 2026 session analysis.',
+    confidence: [
+      { label: 'Congress narrative evidence', pct: 88 },
+      { label: 'Social signal corroboration', pct: 81 },
+      { label: 'KOL language pattern', pct: 73 }
+    ],
+    forecast: 'Forecast: The curative narrative advantage for gene therapy in neuromuscular disease will compound if not counter-framed before ACHIEVE reads out. Post-readout framing is reactive; pre-readout positioning is proactive. Each month without a competitive narrative for FORCE™ increases the probability that even a positive ACHIEVE result is contextualized as "better than nothing" rather than "right mechanism for this disease." Probability of reactive post-readout framing scenario: 66%.'
+  }
+};
+
+function openDefend(community) {
+  var d = defendData[community];
+  if (!d) return;
+  document.getElementById('overlay-label').textContent = d.label;
+  document.getElementById('overlay-heading').textContent = d.heading;
+  document.getElementById('overlay-subtext').textContent = d.subtext;
+  document.getElementById('overlay-forecast').textContent = d.forecast;
+  var rows = '';
+  d.confidence.forEach(function(c) {
+    rows += '<div class="confidence-row">' +
+      '<span class="confidence-label">' + c.label + '</span>' +
+      '<div class="confidence-bar-wrap"><div class="confidence-bar" data-pct="' + c.pct + '" style="width:0%"></div></div>' +
+      '<span class="confidence-pct">' + c.pct + '%</span>' +
+      '</div>';
+  });
+  document.getElementById('confidence-rows').innerHTML = rows;
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(function() {
+    document.querySelectorAll('.confidence-bar[data-pct]').forEach(function(bar) {
+      bar.style.width = bar.getAttribute('data-pct') + '%';
+    });
+  }, 80);
+}
+
+function openPersona() {
+  document.getElementById('overlay-label').textContent = 'Personalize Brief';
+  document.getElementById('overlay-heading').textContent = 'Customize your morning brief';
+  document.getElementById('overlay-subtext').textContent = 'Your focus area, role, or congress context shapes which signals surface first. Saved to your Aurivian profile.';
+  document.getElementById('overlay-forecast').textContent = '';
+  document.getElementById('confidence-rows').innerHTML = '';
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeOverlay() {
+  document.getElementById('overlay').classList.remove('open');
+}
+
+// ── AUDIO PLAYER ────────────────────────────
+var audio  = document.getElementById('brief-audio');
+var bar    = document.getElementById('audio-bar');
+var fill   = document.getElementById('audio-fill');
+var timeEl = document.getElementById('audio-time');
+var icon   = document.getElementById('play-icon');
+
+function fmt(s) {
+  var m = Math.floor(s / 60), sec = Math.floor(s % 60);
+  return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+audio.addEventListener('timeupdate', function() {
+  if (!audio.duration) return;
+  fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+  timeEl.textContent = fmt(audio.currentTime) + ' / ' + fmt(audio.duration);
+});
+
+audio.addEventListener('ended', function() {
+  icon.innerHTML = '&#9654;';
+});
+
+function toggleAudio() {
+  if (audio.paused) {
+    audio.play().then(function() {
+      icon.innerHTML = '&#9646;&#9646;';
+    }).catch(function(err) { console.warn('Audio play failed:', err); });
+  } else {
+    audio.pause();
+    icon.innerHTML = '&#9654;';
+  }
+}
+
+function closeAudio() {
+  audio.pause();
+  audio.currentTime = 0;
+  bar.classList.remove('open');
+  icon.innerHTML = '&#9654;';
+  fill.style.width = '0%';
+}
+
+function scrubAudio(e) {
+  var rect = document.getElementById('audio-track').getBoundingClientRect();
+  audio.currentTime = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * (audio.duration || 0);
+}
+
+// ── ON LOAD ──────────────────────────────────
+window.addEventListener('DOMContentLoaded', function() {
+  // Narrative map: 'achieve' active by default
+  activateNarr('achieve');
+});
+</script>
+</body>
+</html>
