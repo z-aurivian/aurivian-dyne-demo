@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Inbox, Filter, ShieldCheck, Rocket, CheckCircle2, Radio,
-  Calendar, TrendingUp, ExternalLink,
+  Calendar, TrendingUp, ExternalLink, GitBranch, X,
 } from 'lucide-react';
 import { INSIGHTS, ACTIONS, SIGNALS } from '../config';
+import { getPinnedIds, subscribePinned, unpinInsight } from '../lib/journeyStore';
 
 // ─── Derivation ─────────────────────────────────────────────────────────
 //
@@ -73,17 +74,41 @@ function dominantImpactFor(insight) {
 
 // ─── Cards ──────────────────────────────────────────────────────────────
 
-function InsightCard({ insight }) {
+function InsightCard({ insight, pinned }) {
   const navigate = useNavigate();
   const related = ACTIONS.filter(a => a.fromInsightRef === insight.id);
   const impact = dominantImpactFor(insight);
+
+  const handleUnpin = (e) => {
+    e.stopPropagation();
+    unpinInsight(insight.id);
+  };
 
   return (
     <button
       onClick={() => navigate('/insights')}
       title="Open in NOVA · Strategy-to-Action"
-      className="w-full text-left rounded-lg border border-auri-border bg-white p-3 hover:border-auri-blue/50 hover:shadow-sm transition-all group"
+      className={`w-full text-left rounded-lg border bg-auri-bg p-3 hover:shadow-sm transition-all group ${pinned ? 'border-auri-text/60 ring-1 ring-auri-text/30 hover:border-auri-text' : 'border-auri-border hover:border-auri-text/50'}`}
     >
+      {/* Pinned-from-NOVA pill */}
+      {pinned && (
+        <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-auri-text/20">
+          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-auri-text">
+            <GitBranch size={11} /> Just added from NOVA
+          </span>
+          <span
+            role="button"
+            tabIndex={0}
+            onClick={handleUnpin}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleUnpin(e); }}
+            className="text-auri-muted hover:text-auri-text"
+            title="Remove from journey"
+          >
+            <X size={12} />
+          </span>
+        </div>
+      )}
+
       {/* Header row */}
       <div className="flex items-start justify-between gap-2 mb-1.5">
         <div className="flex items-center gap-1.5 flex-wrap">
@@ -104,7 +129,7 @@ function InsightCard({ insight }) {
           <span key={lp} className="text-[9px] font-medium px-1.5 py-0.5 rounded border bg-auri-card text-auri-muted border-auri-border">{lp}</span>
         ))}
         {insight.moRefs?.map(mo => (
-          <span key={mo} className="text-[9px] font-medium px-1.5 py-0.5 rounded border bg-auri-blue/5 text-auri-blue border-auri-blue/20">{mo}</span>
+          <span key={mo} className="text-[9px] font-medium px-1.5 py-0.5 rounded border bg-auri-text/5 text-auri-text border-auri-text/20">{mo}</span>
         ))}
       </div>
 
@@ -144,7 +169,7 @@ function SignalCard({ signal }) {
   return (
     <button
       onClick={() => navigate(signal.suggestedAction?.path || '/')}
-      className="w-full text-left rounded-lg border border-dashed border-auri-border bg-white p-3 hover:border-auri-blue/50 hover:shadow-sm transition-all"
+      className="w-full text-left rounded-lg border border-dashed border-auri-border bg-auri-bg p-3 hover:border-auri-text/50 hover:shadow-sm transition-all"
     >
       <div className="flex items-center gap-2 mb-1.5">
         <Radio size={11} className="text-auri-muted" />
@@ -162,12 +187,21 @@ function SignalCard({ signal }) {
 // ─── Board ──────────────────────────────────────────────────────────────
 
 export default function InsightJourney() {
-  // Bucket insights into lanes.
+  const [pinnedIds, setPinnedIds] = useState(() => getPinnedIds());
+
+  useEffect(() => subscribePinned(setPinnedIds), []);
+  const pinnedSet = new Set(pinnedIds);
+
+  // Bucket insights into lanes. Pinned-from-NOVA insights are forced
+  // into the Captured lane (treated as "just promoted to the journey")
+  // and placed first so they're easy to spot during a demo.
   const byLane = Object.fromEntries(LANES.map(l => [l.id, []]));
   INSIGHTS.forEach(i => {
-    const lane = laneForInsight(i);
+    const lane = pinnedSet.has(i.id) ? 'captured' : laneForInsight(i);
     byLane[lane].push(i);
   });
+  // Keep pinned items at the top of Captured.
+  byLane.captured.sort((a, b) => Number(pinnedSet.has(b.id)) - Number(pinnedSet.has(a.id)));
 
   // Top 3 signals populate the Captured lane as "not-yet-formalised" entries.
   const signalsInCaptured = SIGNALS.slice(0, 3);
@@ -216,7 +250,7 @@ export default function InsightJourney() {
               {/* Cards */}
               <div className="space-y-2">
                 {extras.map((s, i) => <SignalCard key={`s-${i}`} signal={s} />)}
-                {items.map(i => <InsightCard key={i.id} insight={i} />)}
+                {items.map(i => <InsightCard key={i.id} insight={i} pinned={pinnedSet.has(i.id)} />)}
                 {total === 0 && (
                   <div className="text-[11px] text-auri-muted italic text-center py-4">—</div>
                 )}

@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Target, Layers, Eye, FileText, TrendingUp, Radar, ShieldCheck,
   ChevronDown, MessageSquare, Calendar, MapPin, AlertCircle,
+  GitBranch, Check,
 } from 'lucide-react';
 import {
   ISP_PILLARS, MEDICAL_OBJECTIVES, LISTENING_PRIORITIES, COVERAGE_TARGETS,
   INSIGHTS, ACTIONS, GAP_RADAR,
 } from '../config';
+import { isPinned, pinInsight, unpinInsight, subscribePinned } from '../lib/journeyStore';
 
 // ─── Shared style maps ──────────────────────────────────────────────────
 
@@ -69,7 +71,7 @@ function SectionHeader({ icon: Icon, label, sub, right }) {
   return (
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center gap-2">
-        <Icon size={16} className="text-auri-blue" />
+        <Icon size={16} className="text-auri-text" />
         <h3 className="text-sm font-semibold text-auri-text uppercase tracking-wider">{label}</h3>
         {sub && <span className="text-xs text-auri-muted">{sub}</span>}
       </div>
@@ -84,7 +86,7 @@ function ISPPillars() {
       <SectionHeader icon={Layers} label="Integrated Strategic Plan" sub="2024–2026" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {ISP_PILLARS.map((p) => (
-          <div key={p.id} className="rounded-xl border border-auri-border bg-white p-4">
+          <div key={p.id} className="rounded-xl border border-auri-border bg-auri-bg p-4">
             <div className="text-[10px] uppercase tracking-wider text-auri-muted mb-1">Pillar · {p.id}</div>
             <div className="text-sm font-semibold text-auri-text leading-snug mb-1.5">{p.title}</div>
             <p className="text-xs text-auri-muted leading-relaxed">{p.description}</p>
@@ -99,7 +101,7 @@ function MedicalObjectives() {
   return (
     <section>
       <SectionHeader icon={Target} label="Plan of Action" sub="Medical Objectives" />
-      <div className="rounded-xl border border-auri-border bg-white overflow-hidden">
+      <div className="rounded-xl border border-auri-border bg-auri-bg overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-auri-card text-xs uppercase tracking-wider text-auri-muted">
             <tr>
@@ -138,7 +140,7 @@ function ListeningPrioritiesTable() {
   return (
     <section>
       <SectionHeader icon={Eye} label="Listening Priorities" sub="KIQs & KITs" />
-      <div className="rounded-xl border border-auri-border bg-white overflow-hidden">
+      <div className="rounded-xl border border-auri-border bg-auri-bg overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-auri-card text-xs uppercase tracking-wider text-auri-muted">
             <tr>
@@ -173,8 +175,20 @@ function ListeningPrioritiesTable() {
 
 function InsightCard({ insight }) {
   const [open, setOpen] = useState(false);
+  const [pinned, setPinned] = useState(() => isPinned(insight.id));
+
+  useEffect(() => {
+    return subscribePinned((ids) => setPinned(ids.includes(insight.id)));
+  }, [insight.id]);
+
+  const handlePinClick = (e) => {
+    e.stopPropagation();
+    if (pinned) unpinInsight(insight.id);
+    else        pinInsight(insight.id);
+  };
+
   return (
-    <div className="rounded-xl border border-auri-border bg-white overflow-hidden">
+    <div className={`rounded-xl border bg-auri-bg overflow-hidden transition-all ${pinned ? 'border-auri-text/60 ring-1 ring-auri-text/30' : 'border-auri-border'}`}>
       <button
         onClick={() => setOpen(!open)}
         className="w-full text-left p-4 hover:bg-auri-card transition-colors"
@@ -190,16 +204,36 @@ function InsightCard({ insight }) {
                 <span key={lp} className="text-[10px] font-medium px-2 py-0.5 rounded border bg-auri-card text-auri-muted border-auri-border">{lp}</span>
               ))}
               {insight.moRefs?.map(mo => (
-                <span key={mo} className="text-[10px] font-medium px-2 py-0.5 rounded border bg-auri-blue/5 text-auri-blue border-auri-blue/20">{mo}</span>
+                <span key={mo} className="text-[10px] font-medium px-2 py-0.5 rounded border bg-auri-text/5 text-auri-text border-auri-text/20">{mo}</span>
               ))}
               <span className={`text-[10px] font-medium px-2 py-0.5 rounded border ${STATUS_STYLE[insight.status] || ''}`}>{insight.status}</span>
+              {pinned && (
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded border bg-auri-text/10 text-auri-text border-auri-text/30 inline-flex items-center gap-1">
+                  <GitBranch size={10} /> On Insight Journey
+                </span>
+              )}
             </div>
             <div className="text-sm font-semibold text-auri-text mb-1.5 leading-snug">{insight.title}</div>
             <p className="text-sm text-auri-muted leading-relaxed">{insight.summary}</p>
           </div>
-          <div className="text-right shrink-0">
-            <div className="text-[10px] uppercase tracking-wider text-auri-muted mb-1">Confidence</div>
-            <div className="text-lg font-semibold text-auri-text">{Math.round(insight.confidenceScore * 100)}%</div>
+          <div className="text-right shrink-0 flex flex-col items-end gap-2">
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-auri-muted mb-1">Confidence</div>
+              <div className="text-lg font-semibold text-auri-text">{Math.round(insight.confidenceScore * 100)}%</div>
+            </div>
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={handlePinClick}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handlePinClick(e); }}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all cursor-pointer ${
+                pinned
+                  ? 'bg-auri-text text-auri-bg border-auri-text'
+                  : 'bg-auri-bg text-auri-muted border-auri-border hover:text-auri-text hover:border-auri-text/50'
+              }`}
+            >
+              {pinned ? <><Check size={12} /> Added to Journey</> : <><GitBranch size={12} /> Add to Insight Journey</>}
+            </span>
           </div>
         </div>
         <div className="flex items-center gap-4 mt-3 text-[11px] text-auri-muted">
@@ -215,7 +249,7 @@ function InsightCard({ insight }) {
           <div className="text-[10px] uppercase tracking-wider text-auri-muted mb-2">Source insights ({insight.sourceInsights?.length || 0})</div>
           <div className="space-y-2">
             {insight.sourceInsights?.map((s, i) => (
-              <div key={i} className="bg-white rounded-lg border border-auri-border p-3">
+              <div key={i} className="bg-auri-bg rounded-lg border border-auri-border p-3">
                 <div className="flex items-center gap-2 text-[11px] text-auri-muted mb-1.5">
                   <MessageSquare size={11} className={SOURCE_TYPE_STYLE[s.type] || ''} />
                   <span className={`font-medium ${SOURCE_TYPE_STYLE[s.type] || ''}`}>{s.type}</span>
@@ -269,13 +303,13 @@ function ActionsBoard() {
     <div className="flex items-center gap-1 text-xs">
       <button
         onClick={() => setGroupBy('mo')}
-        className={`px-2.5 py-1 rounded-md transition-all ${groupBy === 'mo' ? 'bg-auri-blue/10 text-auri-blue font-medium' : 'text-auri-muted hover:text-auri-text'}`}
+        className={`px-2.5 py-1 rounded-md transition-all ${groupBy === 'mo' ? 'bg-auri-text text-auri-bg font-medium' : 'text-auri-muted hover:text-auri-text'}`}
       >
         by MO
       </button>
       <button
         onClick={() => setGroupBy('status')}
-        className={`px-2.5 py-1 rounded-md transition-all ${groupBy === 'status' ? 'bg-auri-blue/10 text-auri-blue font-medium' : 'text-auri-muted hover:text-auri-text'}`}
+        className={`px-2.5 py-1 rounded-md transition-all ${groupBy === 'status' ? 'bg-auri-text text-auri-bg font-medium' : 'text-auri-muted hover:text-auri-text'}`}
       >
         by status
       </button>
@@ -304,7 +338,7 @@ function ActionsBoard() {
               {g.actions.map((a) => {
                 const insight = getInsightById(a.fromInsightRef);
                 return (
-                  <div key={a.id} className="rounded-lg border border-auri-border bg-white p-3">
+                  <div key={a.id} className="rounded-lg border border-auri-border bg-auri-bg p-3">
                     <div className="text-sm text-auri-text font-medium leading-snug mb-2">{a.title}</div>
                     <div className="flex flex-wrap items-center gap-1.5 mb-2">
                       <span className={`text-[10px] font-medium px-2 py-0.5 rounded border ${ACTION_STATUS_STYLE[a.status] || ''}`}>{a.status}</span>
@@ -314,7 +348,7 @@ function ActionsBoard() {
                         </span>
                       )}
                       {groupBy !== 'mo' && (
-                        <span className="text-[10px] font-medium px-2 py-0.5 rounded border bg-auri-blue/5 text-auri-blue border-auri-blue/20">{a.moRef}</span>
+                        <span className="text-[10px] font-medium px-2 py-0.5 rounded border bg-auri-text/5 text-auri-text border-auri-text/20">{a.moRef}</span>
                       )}
                     </div>
                     <div className="flex items-center justify-between text-[11px] text-auri-muted">
@@ -339,11 +373,11 @@ function GapRadarSection() {
       <SectionHeader icon={Radar} label="Gap Radar" sub="agent-proposed" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {GAP_RADAR.map((g, idx) => (
-          <div key={idx} className="rounded-xl border border-auri-border bg-white p-4">
+          <div key={idx} className="rounded-xl border border-auri-border bg-auri-bg p-4">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-auri-blue">{g.type}</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-auri-text">{g.type}</span>
               {g.moRef && (
-                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded border bg-auri-blue/5 text-auri-blue border-auri-blue/20">{g.moRef}</span>
+                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded border bg-auri-text/5 text-auri-text border-auri-text/20">{g.moRef}</span>
               )}
             </div>
             <div className="text-sm text-auri-text font-medium mb-1.5 leading-snug">{g.suggestion}</div>
@@ -360,7 +394,7 @@ function GapRadarSection() {
 export default function StrategyToAction() {
   if (!MEDICAL_OBJECTIVES || MEDICAL_OBJECTIVES.length === 0) {
     return (
-      <div className="rounded-xl border border-auri-border bg-white p-8 text-center">
+      <div className="rounded-xl border border-auri-border bg-auri-bg p-8 text-center">
         <AlertCircle size={24} className="text-auri-muted mx-auto mb-2" />
         <div className="text-sm text-auri-text font-medium">Strategy-to-Action needs a strategic framework.</div>
         <p className="text-xs text-auri-muted mt-1">

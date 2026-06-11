@@ -16,3 +16,5 @@ export const CLIENT = {
 
 // No standalone capture app for this demo — button is greyed out
 export const CAPTURE_APP_URL = null;
+
+export const PULSE_BRIEF_URL = '/pulse_dyne_brief.html';
