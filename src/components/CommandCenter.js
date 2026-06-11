@@ -152,15 +152,22 @@ export default function CommandCenter() {
             </NavLink>
           );
         })}
-        <a
-          href={CAPTURE_APP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-white border border-auri-border text-auri-muted hover:text-auri-text hover:border-auri-blue/50 transition-all"
-        >
-          <ExternalLink size={16} />
-          <span>Congress Capture</span>
-        </a>
+        {CAPTURE_APP_URL ? (
+          <a
+            href={CAPTURE_APP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-auri-card border border-auri-border text-auri-muted hover:text-auri-text hover:border-auri-border transition-all"
+          >
+            <ExternalLink size={16} />
+            <span>Congress Capture</span>
+          </a>
+        ) : (
+          <span className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border border-auri-border text-auri-muted opacity-40 cursor-not-allowed select-none">
+            <ExternalLink size={16} />
+            <span>Congress Capture</span>
+          </span>
+        )}
       </div>
 
       {/* Two-column: Signals + Coverage */}

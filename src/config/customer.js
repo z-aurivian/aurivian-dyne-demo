@@ -14,4 +14,5 @@ export const CLIENT = {
   logoSrc: null,
 };
 
-export const CAPTURE_APP_URL = 'https://aurivian-capture-demo.vercel.app';
+// No standalone capture app for this demo — button is greyed out
+export const CAPTURE_APP_URL = null;
